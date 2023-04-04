@@ -6,9 +6,10 @@ const fileNames = [
 function FileSelector(props:{onChange:(s:string) => void, selected:string}) {
     return (
         <div className="FileSelector">
-            <span>Select a file</span>
+            <img src={require("../images/logo.png")} alt="logo" width="325" height="325"/>
+            <p className="SelectLabel">Select the WebAssembly file</p>
             <select multiple onChange={(event)=> props.onChange(event.target.value)} value = { props.selected }>
-            {fileNames.map((fileName) => (<option key={ fileName }>{ fileName }</option>))}
+            {fileNames.map((fileName) => (<option className='OptionFile' key={ fileName }>{ fileName }</option>))}
             </select>
         </div>
     );
