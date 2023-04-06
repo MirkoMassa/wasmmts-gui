@@ -7,6 +7,7 @@ import Slider from './components/Slider'
 import FileSelector from './components/FileSelector'
 import FunctionSelector from './components/FunctionSelector';
 import { custom } from 'wasmmts-a_wasm_interpreter/build/src/types';
+import Topbar from './components/Topbar';
 
 function App() {
   const [wasmStates, setwasmStates] = useState([] as stateDescriptor[]);
@@ -59,10 +60,13 @@ function App() {
   // currState slider
   return (
     <div className="App">
-      <FileSelector onChange={updateWasm} selected={filename}/>
-      <Slider showMemory= {showMemory} wasmStores ={wasmStores} wasmPatches = {wasmPatches} wasmStates={wasmStates} wasmInstance = {wasmInstance}/>
-      <FunctionSelector run={run} watText = {watText} setFunc = {setFuncname} 
+      <Topbar/>
+      <div className='WasmMTS_demo'>
+        <FileSelector onChange={updateWasm} selected={filename}/>
+        <Slider showMemory= {showMemory} wasmStores ={wasmStores} wasmPatches = {wasmPatches} wasmStates={wasmStates} wasmInstance = {wasmInstance}/>
+        <FunctionSelector run={run} watText = {watText} setFunc = {setFuncname} 
         wasmInstance = {wasmInstance}/>
+      </div>
     </div>
   );
 }
@@ -76,13 +80,13 @@ async function instantiateModule(filename:string):Promise<execTypes.WebAssemblyM
 }
 
 async function getWasm(path:string):Promise<ArrayBuffer>{
-  const res:Response = await fetch(`http://localhost:4000/wasm/${path}`);
+  const res:Response = await fetch(`./wasm/${path}`);
   const wasmBuffer = await res.arrayBuffer();
   return wasmBuffer;
 }
 
 async function getWat(path:string):Promise<string>{
-  const res:Response = await fetch(`http://localhost:4000/wat/${path}`);
+  const res:Response = await fetch(`./wat/${path}`);
   const watText = await res.text();
   return watText;
 }
