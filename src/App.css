@@ -1,8 +1,33 @@
 body{
   background-color:#5A5A5A;
 }
-
 .App {
+  display: block;
+}
+.Topbar {
+  background-color: #333;
+  overflow: hidden;
+}
+.Topbar a {
+  float: left;
+  text-align: center;
+  padding: 15px 20px;
+  font-family: 'Roboto', sans-serif;
+  font-size: 25px;
+  color:White;
+  text-decoration: none;
+}
+.Topbar a:hover {
+  background-color: White;
+  color: black;
+}
+.Topbar a.active {
+  background-color: #654ff0;
+  color: white;
+}
+
+
+.WasmMTS_demo {
   display: grid;
   grid-template-columns: 40ch 90ch auto;
   grid-gap: 30px;
@@ -131,7 +156,7 @@ img {
 .RunBtn {
   background: #e74c3c;
   color: #fff;
-
+  margin-left: 22ch;
 }
 
 .RunBtn:hover {
