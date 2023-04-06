@@ -10,7 +10,8 @@ function FunctionSelector(props:{run:()=>void ,watText:string, setFunc:(name:str
                     Object.keys(props.wasmInstance.exportsTT).map(funcName => <option className='OptionFunc' key={ funcName }>{ funcName }</option>) }</select>
             </div>
             <button className='RunBtn' onClick={props.run}>RUN</button>
-            <pre className="watText">\/ Text Format \/<br/><br/>{props.watText}</pre>
+            <p className="SelectLabel">\/ Text Format \/</p>
+            <pre className="watText">{props.watText}</pre>
         </div>
     );
   }
