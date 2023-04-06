@@ -1,6 +1,6 @@
 import '../App.css';
 const fileNames = [
-    'arrays', 'loop', 'block', 'fib', 'call', 'loadstore'
+    'fib','arrays', 'loop', 'block', 'call', 'loadstore'
 ];
 
 function FileSelector(props:{onChange:(s:string) => void, selected:string}) {
@@ -11,6 +11,7 @@ function FileSelector(props:{onChange:(s:string) => void, selected:string}) {
             <select multiple onChange={(event)=> props.onChange(event.target.value)} value = { props.selected }>
             {fileNames.map((fileName) => (<option className='OptionFile' key={ fileName }>{ fileName }</option>))}
             </select>
+            <br />
         </div>
     );
   }
