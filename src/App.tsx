@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import './App.css';
 import WASMMTS, { WebAssemblyMtsStore } from 'wasmmts-a_wasm_interpreter/build/src/exec/wasmm'
 import * as execTypes from 'wasmmts-a_wasm_interpreter/build/src/exec/types'
@@ -63,9 +63,10 @@ function App() {
       <Topbar/>
       <div className='WasmMTS_demo'>
         <FileSelector onChange={updateWasm} selected={filename}/>
-        <Slider showMemory= {showMemory} wasmStores ={wasmStores} wasmPatches = {wasmPatches} wasmStates={wasmStates} wasmInstance = {wasmInstance}/>
-        <FunctionSelector run={run} watText = {watText} setFunc = {setFuncname} 
-        wasmInstance = {wasmInstance}/>
+        <FunctionSelector run={run} setFunc = {setFuncname} 
+        wasmInstance = {wasmInstance} selected= {funcname}/>
+        <Slider showMemory= {showMemory} wasmStores ={wasmStores} wasmPatches = {wasmPatches} wasmStates={wasmStates} wasmInstance = {wasmInstance} watText = {watText}/>
+        
       </div>
     </div>
   );
