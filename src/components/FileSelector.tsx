@@ -6,12 +6,11 @@ const fileNames = [
 function FileSelector(props:{onChange:(s:string) => void, selected:string}) {
     return (
         <div className="FileSelector">
-            <img src={require("../images/logo.png")} alt="logo" width="325" height="325"/>
-            <p className="SelectLabel">Select the WebAssembly file</p>
-            <select multiple onChange={(event)=> props.onChange(event.target.value)} value = { props.selected }>
+            <p className="SelectLabel">Select the .wat file:</p>
+            <select onChange={(event)=> props.onChange(event.target.value)}  value = { props.selected }>
+            <option hidden>Select a .wat file...</option>
             {fileNames.map((fileName) => (<option className='OptionFile' key={ fileName }>{ fileName }</option>))}
             </select>
-            <br />
         </div>
     );
   }
