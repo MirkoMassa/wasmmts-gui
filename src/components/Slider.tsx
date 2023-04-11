@@ -1,14 +1,14 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import '../App.css';
 import * as execTypes from 'wasmmts-a_wasm_interpreter/build/src/exec/types'
 import {stateDescriptor, descCurrentLabel, descCurrentFrame, getCustoms, patchesDescriptor} from 'wasmmts-a_wasm_interpreter/build/src/debugging/stringifier'
 import { WebAssemblyMtsStore } from 'wasmmts-a_wasm_interpreter/build/src/exec/wasmm';
 import { custom } from 'wasmmts-a_wasm_interpreter/build/src/types';
 
-function Slider(props: {showMemory:(currState:WebAssemblyMtsStore) => void, wasmStores:execTypes.storeProducePatches , wasmPatches:patchesDescriptor[], wasmStates: stateDescriptor[], wasmInstance:execTypes.WebAssemblyMtsInstance}) {
+function Slider(props: {showMemory:(currState:WebAssemblyMtsStore) => void, wasmStores:execTypes.storeProducePatches , wasmPatches:patchesDescriptor[], wasmStates: stateDescriptor[], wasmInstance:execTypes.WebAssemblyMtsInstance, watText:string}) {
     const[val, setVal] = useState(0);
     // console.log(props.wasmStates, val);
-
+    const watTextAsArray = props.watText.split('\n');
     if(props.wasmStates.length<val){
         setVal(0);
     }
@@ -32,19 +32,23 @@ function Slider(props: {showMemory:(currState:WebAssemblyMtsStore) => void, wasm
     //     })()
     // }, [])
 
-    return (<div className="Slidercontainer">
-            <p className='StackLabel'>Stack</p>
-
-            {props.wasmStates[val] && props.wasmStates[val].elemDescriptors.map((elem, i) => 
-            <pre className = "Description" key={i}>{elem.description}</pre>)}
-            <input className="Slider" type="range" min="0" max={props.wasmStates.length} value={val} onChange={(e) => setVal(e.target.valueAsNumber) } id="myRange"></input>
-            <pre className='StateVal'>State: {(val).toString()}</pre>
-                <div className='labfrContainer'>
-                    {props.wasmStores.states && props.wasmStores.states[val] && <p className='Desc'>Current label: {descCurrentLabel(props.wasmStores.states[val])}</p>}
-                    { props.wasmStores.states && props.wasmStores.states[val] && <p className='Desc'>Current frame: {updateFrame(props.wasmStores.states[val])}</p>}
-                    { props.wasmPatches &&  props.wasmPatches[val] && <p className='Desc'>Patches from previous state: {printPatches()}</p>}
-                </div>
-        </div>)
+    return (<div className="ResultSection">
+                <p className='StackLabel'>Stack</p>
+                <div className='Slidercontainer'>
+                    {props.wasmStates[val] && props.wasmStates[val].elemDescriptors.map((elem, i) => 
+                    <pre className = "Description" key={i}>{elem.description}</pre>)}
+                    <input className="Slider" type="range" min="0" max={props.wasmStates.length} value={val} onChange={(e) => setVal(e.target.valueAsNumber) } id="myRange"></input>
+                    <pre className='StateVal'>State: {(val).toString()}</pre>
+                        <div className='labfrContainer'>
+                            {props.wasmStores.states && props.wasmStores.states[val] && <p className='Desc'>Current label: {descCurrentLabel(props.wasmStores.states[val])}</p>}
+                            { props.wasmStores.states && props.wasmStores.states[val] && <><p className='Desc'>Current frame: {updateFrame(props.wasmStores.states[val])}</p><br /></>}
+                            { props.wasmPatches &&  props.wasmPatches[val] && <p className='Desc'>Patches from previous state: {printPatches()}</p>}
+                        </div>
+                    
+                    </div>
+                <br/><p className="SelectLabel">🡳 WebAssembly Text Format 🡳</p>
+                <br/><pre className="watText">{watTextAsArray.map(row => <><span className="lineNum"></span><code>{row}</code></>)}</pre>
+            </div>)
 }
 
   export default Slider;
