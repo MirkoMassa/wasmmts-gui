@@ -5,7 +5,10 @@ import * as execTypes from 'wasmmts-a_wasm_interpreter/build/src/exec/types'
 import {buildStateStrings, patchesDescriptor, stateDescriptor, buildPatchesStrings} from 'wasmmts-a_wasm_interpreter/build/src/debugging/stringifier'
 import Slider from './components/Slider'
 import FileSelector from './components/FileSelector'
+import FileSelectorDesktop from './components/FileSelectorDesktop'
 import FunctionSelector from './components/FunctionSelector';
+import FunctionSelectorDesktop from './components/FunctionSelectorDesktop';
+import RunButton from './components/RunButton';
 import { custom } from 'wasmmts-a_wasm_interpreter/build/src/types';
 import Topbar from './components/Topbar';
 
@@ -63,10 +66,13 @@ function App() {
       <Topbar/>
       <div className='WasmMTS_demo'>
         <FileSelector onChange={updateWasm} selected={filename}/>
-        <FunctionSelector run={run} setFunc = {setFuncname} 
+        <FileSelectorDesktop onChange={updateWasm} selected={filename}/>
+        <FunctionSelector setFunc = {setFuncname} 
         wasmInstance = {wasmInstance} selected= {funcname}/>
+        <FunctionSelectorDesktop setFunc = {setFuncname} 
+        wasmInstance = {wasmInstance} selected= {funcname}/>
+        <RunButton run={run}/>
         <Slider showMemory= {showMemory} wasmStores ={wasmStores} wasmPatches = {wasmPatches} wasmStates={wasmStates} wasmInstance = {wasmInstance} watText = {watText}/>
-        
       </div>
     </div>
   );
