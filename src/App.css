@@ -21,15 +21,35 @@ https://css-tricks.com/a-specificity-battle/
 /* body{
   background-color:#5A5A5A;
 } */
+body{
+  background-color: #99B898;
+}
 :root {
-  --color-topbar: rgb(173, 189, 209);
+  --color-topbar: white
+}
+.App {
+  width: 100%;
 }
 .WasmMTS_demo {
   display: grid;
   grid-template-rows: auto auto auto;
   margin: 1rem;
 }
-
+#git {
+  background-image: url("./images/git.png");
+  width: 50px;
+  height: 50px;
+  background-size: contain;
+  background-repeat: no-repeat;
+  /* border: 1px solid blue; */
+}
+#linkedin {
+  background-image: url("./images/lnkin.png");
+  width: 50px;
+  height: 50px;
+  background-size: contain;
+  background-repeat: no-repeat;
+}
 img {
   width: 50px;
   height: 50px;
@@ -38,8 +58,10 @@ img {
   display: grid;
   grid-template-columns: auto auto auto 1fr;
   grid-template-rows: 50px;
-  grid-gap: 0.5em;
   background-color: var(--color-topbar);
+  border: 0.5px solid black;
+}
+.Topbar div {
   border: 0.5px solid black;
 }
 .Topbar a {
@@ -65,7 +87,7 @@ img {
   display: grid;
 }
 .watText {
-  background: lightgray;
+  background: #FECEA8;
   height: 118vw;
   overflow-x: scroll;
   overflow-y: scroll !important;
@@ -97,19 +119,33 @@ img {
   justify-content: space-between;
   margin-bottom: 5%;
 }
-
-.Functions {
-  display: grid;
-  margin-bottom: 15%;
+.FileSelectorDesktop{
+  visibility: hidden;
+  display: none;
 }
+
 .FunctionSelector {
   display: flex;
   justify-content: space-between;
 }
+.FunctionSelectorDesktop {
+  visibility: hidden;
+  display: none;
+}
 
+.Functions {
+  display: grid;
+  width: 100%;
+  margin-bottom: 15%;
+}
+
+.ButtonDiv {
+  display: grid;
+  grid-template-columns: left right;
+}
 .RunBtn {
-  margin-top: 10%;
-  background: #e74c3c;
+  width:100%;
+  background: #E84A5F;
   color: #fff;
 }
 .RunBtn:hover {
@@ -137,7 +173,6 @@ button {
   background: none;
   cursor: pointer;
   padding: 1vw;
-  margin: 1vw;
   text-transform: uppercase;
   font-weight: 500;
   outline: none;
@@ -153,7 +188,6 @@ button {
   font-size: 20px;
   color:Black;
   text-align: center;
-  background-color: white;
 }
 select {
   background-color: transparent;
@@ -164,7 +198,7 @@ select {
   cursor: inherit;
   line-height: inherit;
 
-
+  z-index: 1;
   outline: none;
   overflow-y: auto;
 }
@@ -197,7 +231,7 @@ option {
   font-family: 'Roboto', sans-serif;
   font-size: 17px;
   color:black;
-  text-align: center;
+  text-align: left;
 }
 .StackLabel {
   font-family: 'Roboto', sans-serif;
@@ -208,17 +242,29 @@ option {
 .StateVal {
   font-family: 'Roboto', sans-serif;
   font-size: 20px;
-  color:rgb(29, 136, 14);
-  text-align: center;
+  color: #2A363B;
+  text-align: left;
 }
 
 .Desc {
   font-family: 'Roboto', sans-serif;
   font-size: 20px;
   color:black;
-  text-align: center;
+  text-align: left;
 }
-
+/* fullscreen desktop */
+@media screen and (min-width: 1500px){
+  .ButtonDiv {
+    position: absolute;
+    width: 50%;
+    grid-area: left;
+    left: 48vw;
+    z-index: 2;
+  }
+  .RunBtn {
+    width: 100%;
+  }
+}
 
 /* Desktop */
 @media screen and (min-width: 400px){
@@ -226,18 +272,12 @@ option {
     width: 100px;
     height: 100px;
   }
-
   .Topbar {
-    background-color: #333;
     overflow: hidden;
-  }
-  .Topbar {
     display: grid;
     grid-template-columns: auto auto auto 1fr;
     grid-template-rows: 100px;
-    grid-gap: 0.5em;
     background-color: var(--color-topbar);
-    border: 0.5px solid black;
   }
   .Topbar a {
     text-align: center;
@@ -249,39 +289,47 @@ option {
   .Slidercontainer {
     overflow: auto;
   }
+  .StateVal {
+    font-size: 30px;
+  }
   .watText {
     overflow-x: auto;
   }
-
+  #git {
+    background-image: url("./images/widegithub.png");
+    width: 180px;
+    height: 100px;
+  }
+  #linkedin {
+    background-image: url("./images/widelinkedin.png");
+    width: 180px;
+    height: 100px;
+  }
   .FileSelector {
-    display: grid;
-    justify-content: space-between;
-
+    visibility: hidden;
+    display: none;
   }
   .FunctionSelector {
-    display: grid;
-    justify-content: space-between;
+    visibility: hidden;
+    display: none;
   }
-  .RunBtn {
-    position: absolute;
-    margin-top: 12vh;
-    width: 15vw;
-    background: #e74c3c;
-    color: #fff;
+  .FunctionSelectorDesktop {
+    visibility: visible;
+    display: flex;
   }
-  .RunBtn:before {
-    position: absolute;
-    height: 100%;
-    line-height: 3;
-    font-size: 140%;
+  .FileSelectorDesktop {
+    visibility: visible;
+    display: flex;
   }
 
-
+  .SelectLabel {
+    font-size: 30px;
+    margin-right: 2vw;
+  }
+  select {
+    font-size: 25px;
+  }
 }
-
-
-
-
 
 /* 
 In tailwind
