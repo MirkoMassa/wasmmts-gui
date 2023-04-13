@@ -33,20 +33,20 @@ function Slider(props: {showMemory:(currState:WebAssemblyMtsStore) => void, wasm
     // }, [])
 
     return (<div className="ResultSection">
-                <p className='StackLabel'>Stack</p>
+                <br /><p className='StackLabel'>Stack</p>
                 <div className='Slidercontainer'>
                     {props.wasmStates[val] && props.wasmStates[val].elemDescriptors.map((elem, i) => 
                     <pre className = "Description" key={i}>{elem.description}</pre>)}
                     <input className="Slider" type="range" min="0" max={props.wasmStates.length} value={val} onChange={(e) => setVal(e.target.valueAsNumber) } id="myRange"></input>
                     <pre className='StateVal'>State: {(val).toString()}</pre>
-                        <div className='labfrContainer'>
-                            {props.wasmStores.states && props.wasmStores.states[val] && <p className='Desc'>Current label: {descCurrentLabel(props.wasmStores.states[val])}</p>}
-                            { props.wasmStores.states && props.wasmStores.states[val] && <><p className='Desc'>Current frame: {updateFrame(props.wasmStores.states[val])}</p><br /></>}
-                            { props.wasmPatches &&  props.wasmPatches[val] && <p className='Desc'>Patches from previous state: {printPatches()}</p>}
-                        </div>
+                    <div className='labfrContainer'>
+                        {props.wasmStores.states && props.wasmStores.states[val] && <p className='Desc'>Current label: {descCurrentLabel(props.wasmStores.states[val])}</p>}
+                        { props.wasmStores.states && props.wasmStores.states[val] && <><p className='Desc'>Current frame: {updateFrame(props.wasmStores.states[val])}</p><br /></>}
+                        { props.wasmPatches &&  props.wasmPatches[val] && <p className='Desc'>Patches from previous state: {printPatches()}</p>}
+                    </div>
                     
                     </div>
-                <br/><p className="SelectLabel">🡳 WebAssembly Text Format 🡳</p>
+                <br/><p className="SelectLabel"> WebAssembly Text Format </p>
                 <br/><pre className="watText">{watTextAsArray.map(row => <><span className="lineNum"></span><code>{row}</code></>)}</pre>
             </div>)
 }
