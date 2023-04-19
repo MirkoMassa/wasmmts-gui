@@ -20,6 +20,7 @@ function App() {
   const [wasmInstance, setWasmInstance] = useState({} as execTypes.WebAssemblyMtsInstance);
   const [watText, setwatText] = useState("");
   const [wasmPatches, setwasmPatches] = useState([] as patchesDescriptor[]);
+  const[val, setVal] = useState(0);
 
   async function updateWasm(filename:string){
     setwasmStates([]);
@@ -54,6 +55,15 @@ function App() {
     setwasmStates(buildStateStrings(res.stores, customSec));
     setwasmPatches(buildPatchesStrings(res.stores, wasmInstance.custom as custom[]));
   }
+  async function slide(interval:number = 500, length:number){
+    await run();
+    for (let i = 0; i < length; i++) {
+      setInterval(() =>{
+
+      }, interval)
+    }
+    
+  }
 
   // useEffect(() => {
   //   (async () => {
@@ -72,7 +82,7 @@ function App() {
         <FunctionSelectorDesktop setFunc = {setFuncname} 
         wasmInstance = {wasmInstance} selected= {funcname}/>
         <RunButton run={run}/>
-        <Slider showMemory= {showMemory} wasmStores ={wasmStores} wasmPatches = {wasmPatches} wasmStates={wasmStates} wasmInstance = {wasmInstance} watText = {watText}/>
+        <Slider val={val} setVal={setVal} showMemory= {showMemory} wasmStores ={wasmStores} wasmPatches = {wasmPatches} wasmStates={wasmStates} wasmInstance = {wasmInstance} watText = {watText}/>
       </div>
     </div>
   );
@@ -91,7 +101,7 @@ async function getWasm(path:string):Promise<ArrayBuffer>{
   const wasmBuffer = await res.arrayBuffer();
   return wasmBuffer;
 }
-
+ 
 async function getWat(path:string):Promise<string>{
   const res:Response = await fetch(`./wat/${path}`);
   const watText = await res.text();
