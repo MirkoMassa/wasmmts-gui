@@ -75,8 +75,8 @@ img {
   color: black;
 }
 .Topbar a.active {
-  background-color: #654ff0;
-  color: white;
+  background-color: #FECEA8;
+  color: black;
   display: flex;
   justify-content: center;
   align-content: center;
@@ -141,12 +141,16 @@ img {
 
 .ButtonDiv {
   display: grid;
-  grid-template-columns: left right;
 }
+.PlayButtonDiv {
+  display: grid;
+}
+
 .RunBtn {
   width:100%;
   background: #E84A5F;
   color: #fff;
+  margin-bottom: 10px;
 }
 .RunBtn:hover {
   background: #c0392b;
@@ -182,6 +186,26 @@ button {
   -moz-transition: all 0.3s;
   transition: all 0.3s;
 }
+#Play {
+  background-color: #4CAF50;
+}
+#Play::after{
+  content: ' \25BA';
+  background-color: #4CAF50;
+}
+#Pause {
+  background-color: #FFEB3B;
+  color: black;
+}
+#Pause::after {
+  content: ' \23F8';
+}
+
+#interval {
+  margin-left: 10px;
+  width: 1vw;
+}
+
 /* Selectors */
 .SelectLabel {
   font-family: 'Roboto', sans-serif;
@@ -252,12 +276,17 @@ option {
   color:black;
   text-align: left;
 }
-/* fullscreen desktop */
+/* big desktop (fullscreen and almost fullscreen)*/
 @media screen and (min-width: 1500px){
   .ButtonDiv {
     position: absolute;
     width: 50%;
     grid-area: left;
+    left: 48vw;
+    z-index: 2;
+  }
+  .PlayButtonDiv {
+    width: 20%;
     left: 48vw;
     z-index: 2;
   }
