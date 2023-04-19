@@ -1,11 +1,14 @@
+import { useState } from 'react';
 import '../App.css';
 
-function RunButton(props:{run:()=>void}){
+function RunButton(props:{
+    run:()=>void,
+}){
+    
     return(
         <div className='ButtonDiv'>
             <button className='RunBtn' onClick={props.run}>RUN</button>
         </div>
-        
     )
 }
 
