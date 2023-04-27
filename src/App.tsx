@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
 import './App.css';
-import WASMMTS, { WebAssemblyMtsStore } from 'wasmmts-a_wasm_interpreter/build/src/exec/wasmm'
+import WASMMTS from 'wasmmts-a_wasm_interpreter/build/src/exec/wasmm'
 import * as execTypes from 'wasmmts-a_wasm_interpreter/build/src/exec/types'
-import {buildStateStrings, patchesDescriptor, stateDescriptor, buildPatchesStrings} from 'wasmmts-a_wasm_interpreter/build/src/debugging/stringifier'
+import {buildStateStrings, patchesDescriptor, stateDescriptor, buildPatchesStrings, buildMemStatesStrings, memDescriptors } from 'wasmmts-a_wasm_interpreter/build/src/debugging/stringifier'
 import Slider from './components/Slider'
 import FileSelector from './components/FileSelector'
 import FileSelectorDesktop from './components/FileSelectorDesktop'
@@ -14,13 +14,14 @@ import Topbar from './components/Topbar';
 
 function App() {
   const [wasmStates, setwasmStates] = useState([] as stateDescriptor[]);
+  const [memStates, setMemStates] = useState([] as memDescriptors);
   const [wasmStores, setWasmStores] = useState({} as execTypes.storeProducePatches);
   const [filename, setFilename] = useState('');
   const [funcname, setFuncname] = useState('');
   const [wasmInstance, setWasmInstance] = useState({} as execTypes.WebAssemblyMtsInstance);
   const [watText, setwatText] = useState("");
   const [wasmPatches, setwasmPatches] = useState([] as patchesDescriptor[]);
-  const[val, setVal] = useState(0);
+  const [val, setVal] = useState(0);
 
   async function updateWasm(filename:string){
     setwasmStates([]);
@@ -54,15 +55,20 @@ function App() {
     setWasmStores(res.stores);
     setwasmStates(buildStateStrings(res.stores, customSec));
     setwasmPatches(buildPatchesStrings(res.stores, wasmInstance.custom as custom[]));
+    setwasmMems(res.stores);
   }
-  async function slide(interval:number = 500, length:number){
-    await run();
-    for (let i = 0; i < length; i++) {
-      setInterval(() =>{
+  // async function slide(interval:number = 500, length:number){
+  //   await run();
+  //   for (let i = 0; i < length; i++) {
+  //     setInterval(() =>{
 
-      }, interval)
-    }
+  //     }, interval)
+  // }
     
+  // }
+  function setwasmMems(wasmStores: execTypes.storeProducePatches) {
+    const memBufferStrings = buildMemStatesStrings(wasmStores);
+    setMemStates(memBufferStrings);
   }
 
   // useEffect(() => {
@@ -82,7 +88,7 @@ function App() {
         <FunctionSelectorDesktop setFunc = {setFuncname} 
         wasmInstance = {wasmInstance} selected= {funcname}/>
         <RunButton run={run}/>
-        <Slider val={val} setVal={setVal} showMemory= {showMemory} wasmStores ={wasmStores} wasmPatches = {wasmPatches} wasmStates={wasmStates} wasmInstance = {wasmInstance} watText = {watText}/>
+        <Slider val={val} setVal={setVal} wasmStores ={wasmStores} wasmPatches = {wasmPatches} wasmStates={wasmStates} wasmInstance = {wasmInstance} memStates = {memStates} watText = {watText}/>
       </div>
     </div>
   );
@@ -106,11 +112,6 @@ async function getWat(path:string):Promise<string>{
   const res:Response = await fetch(`./wat/${path}`);
   const watText = await res.text();
   return watText;
-}
-
-function showMemory(currStore:WebAssemblyMtsStore):void{
-  const mem = currStore.takeMem().data.toString();
-  alert(mem);
 }
 
 export default App;
