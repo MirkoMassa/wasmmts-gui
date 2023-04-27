@@ -1,5 +1,4 @@
 import '../App.css';
-import {useEffect, useState} from 'react';
 function PlayButton(props:{
     val:number, setVal: (val:number)=>void,
     length:number,
