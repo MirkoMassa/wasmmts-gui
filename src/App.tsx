@@ -1,27 +1,42 @@
-import React, { useState } from 'react';
-import './App.css';
-import WASMMTS from 'wasmmts-a_wasm_interpreter/build/src/exec/wasmm'
+import {buildStateStrings, patchesDescriptor, stateDescriptor, buildPatchesStrings, 
+    buildMemStatesStrings, memDescriptors, buildMemStatesArrays } from 'wasmmts-a_wasm_interpreter/build/src/debugging/stringifier'
+import WASMMTS, { WasmFuncType } from 'wasmmts-a_wasm_interpreter/build/src/exec/wasmm'
 import * as execTypes from 'wasmmts-a_wasm_interpreter/build/src/exec/types'
-import {buildStateStrings, patchesDescriptor, stateDescriptor, buildPatchesStrings, buildMemStatesStrings, memDescriptors } from 'wasmmts-a_wasm_interpreter/build/src/debugging/stringifier'
-import Slider from './components/Slider'
-import FileSelector from './components/FileSelector'
-import FileSelectorDesktop from './components/FileSelectorDesktop'
-import FunctionSelector from './components/FunctionSelector';
-import FunctionSelectorDesktop from './components/FunctionSelectorDesktop';
-import RunButton from './components/RunButton';
 import { custom } from 'wasmmts-a_wasm_interpreter/build/src/types';
-import Topbar from './components/Topbar';
+
+import './App.css';
+import React, { useEffect, useState } from 'react';
+import MuiTopbar from './components/navbar/MuiTopbar';
+import ActionButtons from './components/MuiActionButtons';
+import MuiCodeView from './components/MuiCodeView';
+import MuiFunctionSelector from './components/MuiFunctionSelector';
+import MuiStackView from './components/MuiStackView';
+import MuiStateSlider from './components/MuiStateSlider';
+import MuiEnterParams from './components/MuiEnterParams';
+import { Alert, Collapse, Container, IconButton } from '@mui/material';
+import MuiParamsAltert from './components/alterts/MuiParamsAlert';
+import MuiParamsAlert from './components/alterts/MuiParamsAlert';
+import MuiInstructions from './components/MuiInstructions';
+
 
 function App() {
   const [wasmStates, setwasmStates] = useState([] as stateDescriptor[]);
-  const [memStates, setMemStates] = useState([] as memDescriptors);
   const [wasmStores, setWasmStores] = useState({} as execTypes.storeProducePatches);
+
+  const [memStates, setMemStates] = useState([] as number[][][]);
+  const [memStatesStrings, setMemStatesStrings] = useState([] as memDescriptors);
+
   const [filename, setFilename] = useState('');
   const [funcname, setFuncname] = useState('');
   const [wasmInstance, setWasmInstance] = useState({} as execTypes.WebAssemblyMtsInstance);
-  const [watText, setwatText] = useState("");
+  const [wasmModule, setWasmModule] = useState({} as execTypes.WebAssemblyMtsModule);
+  const [watText, setwatText] = useState('');
   const [wasmPatches, setwasmPatches] = useState([] as patchesDescriptor[]);
-  const [val, setVal] = useState(0);
+  const [val, setVal] = useState(-1);
+
+  const [currentWasmType, setCurrentWasmType] = useState({} as WasmFuncType);
+  const [params, setParams] = useState([] as number[]);
+
 
   async function updateWasm(filename:string){
     setwasmStates([]);
@@ -29,89 +44,110 @@ function App() {
     setwasmPatches([] as patchesDescriptor[]);
     setFilename(filename);
     setwatText(await getWat(`${filename}.wat`));
-    setWasmInstance(await instantiateModule(filename));
+    const instSource = await instantiateModule(filename)
+    setWasmInstance(instSource.instance);
+    setWasmModule(instSource.module);
   }
 
+  const [ShowParamsAlert, setShowParamsAlert] = useState(false);
   async function run(){
+    const paramsCount = currentWasmType.parameters.length;
     // console.log("exports",wasmInstance.exportsTT);
     // console.log("instance",wasmInstance);
     // console.log("funcname", funcname);
-    const func = wasmInstance.exportsTT[funcname];
-    const customSec:any = wasmInstance.custom;
-    let params:number[] = [];
-
-    let strVal = prompt("Enter args in this old style prompt! (separate multiple vals with ',')")??"0";
-
-    if(!strVal.includes(',')) {
-      params.push(parseInt(strVal));
+    console.log(params.length, paramsCount);
+    if(params.length < paramsCount){
+      setShowParamsAlert(true);
+      return;
     }else{
-      const args = strVal.split(",");
-      for (let i = 0; i < args.length; i++) {
-        params.push(parseInt(args[i]));
+      setShowParamsAlert(false);
+    }
+    for (let i = 0; i < params.length; i++) {
+      if(Number.isNaN(params[i])){
+        setShowParamsAlert(true);
+        break;
+      }else{
+        setShowParamsAlert(false);
       }
     }
-    
+    //assign func
+    const func = wasmInstance.exportsTT[funcname];
+    const customSec:any = wasmInstance.custom;
+
     const res = await func(params);
     setWasmStores(res.stores);
     setwasmStates(buildStateStrings(res.stores, customSec));
     setwasmPatches(buildPatchesStrings(res.stores, wasmInstance.custom as custom[]));
+    setwasmMemsStrings(res.stores);
     setwasmMems(res.stores);
+    setVal(0);
   }
-  // async function slide(interval:number = 500, length:number){
-  //   await run();
-  //   for (let i = 0; i < length; i++) {
-  //     setInterval(() =>{
 
-  //     }, interval)
-  // }
-    
-  // }
-  function setwasmMems(wasmStores: execTypes.storeProducePatches) {
+  function setwasmMemsStrings(wasmStores: execTypes.storeProducePatches) {
     const memBufferStrings = buildMemStatesStrings(wasmStores);
-    setMemStates(memBufferStrings);
+    setMemStatesStrings(memBufferStrings);
+  }
+  function setwasmMems(wasmStores: execTypes.storeProducePatches) {
+    const memBufferArrays = buildMemStatesArrays(wasmStores);
+    setMemStates(memBufferArrays);
   }
 
-  // useEffect(() => {
-  //   (async () => {
-  //     setwasmStates(await instantiateModule(filename));
-  //   })()
-  // }, [])
-  // currState slider
+  useEffect(() => {
+    if(filename !== '')
+    updateWasm(filename)
+  }, [filename])
+
   return (
     <div className="App">
-      <Topbar/>
-      <div className='WasmMTS_demo'>
-        <FileSelector onChange={updateWasm} selected={filename}/>
-        <FileSelectorDesktop onChange={updateWasm} selected={filename}/>
-        <FunctionSelector setFunc = {setFuncname} 
-        wasmInstance = {wasmInstance} selected= {funcname}/>
-        <FunctionSelectorDesktop setFunc = {setFuncname} 
-        wasmInstance = {wasmInstance} selected= {funcname}/>
-        <RunButton run={run}/>
-        <Slider val={val} setVal={setVal} wasmStores ={wasmStores} wasmPatches = {wasmPatches} wasmStates={wasmStates} wasmInstance = {wasmInstance} memStates = {memStates} watText = {watText}/>
-      </div>
+        <MuiTopbar/>
+        
+        <ActionButtons 
+          run={run} 
+          setwatText={setwatText} 
+          funcName={funcname}
+          filename={filename}
+          setFilename={setFilename}
+          wasmInstance={wasmInstance}
+          showParamsAlert={ShowParamsAlert}/>
+        <MuiInstructions/>
+        <MuiFunctionSelector 
+          setFunc={setFuncname} 
+          wasmInstance={wasmInstance} 
+          wasmModule={wasmModule} 
+          wasmStores={wasmStores} 
+          updateWasm={updateWasm} 
+          setCurrentWasmType={setCurrentWasmType}/>
+        <MuiCodeView watText={watText}/>
+        <MuiEnterParams currWasmType={currentWasmType} params={params} setParams={setParams}/>
+        <MuiStackView 
+          val={val} 
+          setVal={setVal}
+          wasmStatesLength={wasmStates.length} 
+          wasmStates={wasmStates} 
+          wasmInstance={wasmInstance} 
+          watText={watText} 
+          memStates={memStates}/>
     </div>
   );
 }
 
-async function instantiateModule(filename:string):Promise<execTypes.WebAssemblyMtsInstance>{
+async function instantiateModule(filename:string):Promise<execTypes.WebAssemblyMtsInstantiatedSource>{
   const buffer = await getWasm(`${filename}.wasm`);
   //@ts-ignore
   const inst = await WASMMTS.instantiate(new Uint8Array(buffer));
   console.log("inst",inst)
-  return inst.instance;
+  return inst;
 }
 
 async function getWasm(path:string):Promise<ArrayBuffer>{
-  const res:Response = await fetch(`./wasm/${path}`);
+  const res:Response = await fetch(`./examples/${path}`);
   const wasmBuffer = await res.arrayBuffer();
   return wasmBuffer;
 }
  
 async function getWat(path:string):Promise<string>{
-  const res:Response = await fetch(`./wat/${path}`);
+  const res:Response = await fetch(`./examples/${path}`);
   const watText = await res.text();
   return watText;
 }
-
 export default App;
