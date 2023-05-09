@@ -5,19 +5,19 @@ import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
 
 function MuiEnterParams(props:{
-    currWasmType:WasmFuncType,
-    params:number[],
-    setParams: (params:number[])=>void,
+    currWasmType: WasmFuncType,
+    params: number[],
+    setParams: (params:number[]) => void,
+    paramsOpen: boolean,
+    setParamsOpen:(b:boolean) => void
     }){
 
-    const [open, setOpen] = useState(true);
     function collapseContainer(){
-            setOpen(!open)
+        props.setParamsOpen(!props.paramsOpen)
     }
 
-    
     function handleInputBoxes(val:number, index:number) {
-        const tempData = props.params.map(param =>param);
+        const tempData = props.params.map(param => param);
         tempData[index] = val;
         props.setParams(tempData);
         console.log(tempData)
@@ -31,26 +31,26 @@ function MuiEnterParams(props:{
         <Typography variant="h6" align='center'>
         <IconButton onClick={collapseContainer}>
             <KeyboardArrowDownIcon sx={{
-                display: open? 'inline-block' : 'none'
+                display: props.paramsOpen? 'inline-block' : 'none'
             }}
             />
             <KeyboardArrowUpIcon sx={{
-                display: open? 'none' : 'inline-block'
+                display: props.paramsOpen? 'none' : 'inline-block'
             }}/>
         </IconButton>
          Enter params here!
          <IconButton onClick={collapseContainer}>
             <KeyboardArrowDownIcon sx={{
-                display: open? 'inline-block' : 'none'
+                display: props.paramsOpen? 'inline-block' : 'none'
             }}
           />
             <KeyboardArrowUpIcon sx={{
-                display: open? 'none' : 'inline-block'
+                display: props.paramsOpen? 'none' : 'inline-block'
             }}/>
         </IconButton>
         </Typography>
 
-        <Collapse in={open} sx={{paddingBottom:"30px"}}>
+        <Collapse in={props.paramsOpen} >
             
                 {props.currWasmType.parameters && 
                 props.currWasmType.parameters.map((type, i) =>
