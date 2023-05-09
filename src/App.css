@@ -12,7 +12,6 @@ img {
     font-size: 14px;
     background: #f1f1f1;
     height: 30vh;
-    overflow-x: scroll;
     overflow-y: scroll !important;
     -webkit-overflow-scrolling: touch;
     counter-reset: line 0;
