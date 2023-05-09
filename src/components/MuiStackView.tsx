@@ -30,15 +30,17 @@ function MuiStackView(props: {
       borderBottom:'1px solid lightgrey',
       maxHeight:'60vh'
       }}>
+        <MuiStateSlider val={props.val} setVal={props.setVal} wasmStatesLength={props.wasmStatesLength}/>
         <Typography variant="h5" align='center'>
         <LayersIcon/> Stack <LayersIcon/> 
-        <MuiStateSlider val={props.val} setVal={props.setVal} wasmStatesLength={props.wasmStatesLength}/>
+        </Typography>
         <Container sx={{
           paddingY:'16px',
           borderBottom:'1px solid lightgrey',
           maxHeight:'40vh',
           overflowY:'scroll'
         }}>
+        
         {props.wasmStates[props.val] && props.wasmStates[props.val].elemDescriptors.map((elem, i) => 
             <Typography variant="subtitle1"
               sx={{
@@ -47,7 +49,7 @@ function MuiStackView(props: {
               }}
             >{elem.description}</Typography>)}
         </Container>
-        </Typography>
+        
         
     </Container>
   )
