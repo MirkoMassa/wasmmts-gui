@@ -67,7 +67,7 @@ function ActionButtons (props:{
       borderBottom:'1px solid lightgrey'
     }}>
         <IconButton size={matches?'large':'small'} color='primary'>
-            <UploadFileIcon/>Import<UploadFileIcon/>
+            Import<UploadFileIcon/>
         </IconButton>
 
         <IconButton size={matches?'large':'small'} onClick={handleOpenExamples}
@@ -75,7 +75,7 @@ function ActionButtons (props:{
             color:'#b26a00'
           }}
         >
-            <FolderOpenIcon/>Examples<FolderOpenIcon/>
+            Examples<FolderOpenIcon/>
         </IconButton>
         
         <IconButton size={matches?'large':'small'} onClick={()=>props.setwatText('')}
@@ -83,7 +83,7 @@ function ActionButtons (props:{
             color:'gray',
           }}
         >
-            <DeleteOutlineIcon/>Clear<DeleteOutlineIcon/>
+            Clear<DeleteOutlineIcon/>
         </IconButton>
 
         <IconButton size={matches?'large':'small'} onClick={executeRunButton}
@@ -91,7 +91,7 @@ function ActionButtons (props:{
             color:'#B81414',
           }}
         >
-            <KeyboardReturnIcon/>Run<KeyboardReturnIcon/>
+            Run<KeyboardReturnIcon/>
         </IconButton>
     </Container>
 
