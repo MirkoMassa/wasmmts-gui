@@ -37,7 +37,7 @@ function MuiStackView(props: {
           paddingY:'16px',
           borderBottom:'1px solid lightgrey',
           maxHeight:'40vh',
-          overflow:'scroll'
+          overflowY:'scroll'
         }}>
         {props.wasmStates[props.val] && props.wasmStates[props.val].elemDescriptors.map((elem, i) => 
             <Typography variant="subtitle1"

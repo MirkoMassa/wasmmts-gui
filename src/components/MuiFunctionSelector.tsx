@@ -13,7 +13,8 @@ function MuiFunctionSelector (props:{
         wasmModule:execTypes.WebAssemblyMtsModule,
         wasmStores:execTypes.storeProducePatches,
         updateWasm: (funcName:string) => void,
-        setCurrentWasmType: (wasmType: WasmFuncType) => void
+        setCurrentWasmType: (wasmType: WasmFuncType) => void,
+        setParamsOpen: (b:boolean) => void
     }) {
     const wasmTypes = props.wasmModule.types;
     const wasmExports = props.wasmModule.exports;
@@ -25,6 +26,7 @@ function MuiFunctionSelector (props:{
     const handleChange = async (event: SelectChangeEvent) => {
         props.setFunc(event.target.value);
         setCurrentLabel(event.target.value as string);
+        props.setParamsOpen(true);
     };
 
     
