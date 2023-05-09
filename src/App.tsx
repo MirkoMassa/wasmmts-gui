@@ -25,9 +25,6 @@ function App() {
   const [wasmStates, setwasmStates] = useState([] as stateDescriptor[]);
   const [wasmStores, setWasmStores] = useState({} as execTypes.storeProducePatches);
 
-  const [memStates, setMemStates] = useState([] as number[][][]);
-  const [memStatesStrings, setMemStatesStrings] = useState([] as memDescriptors);
-
   const [filename, setFilename] = useState('');
   const [funcname, setFuncname] = useState('');
   const [wasmInstance, setWasmInstance] = useState({} as execTypes.WebAssemblyMtsInstance);
@@ -56,12 +53,41 @@ function App() {
   const [watOpen, setWatOpen] = useState(false);
   const [paramsOpen, setParamsOpen] = useState(false);
 
+
+  // Mems
+  const [memStates, setMemStates] = useState([] as number[][][]);
+  const [memStatesRows, setMemStatesRows] = useState([] as number[][])
+  const [currentMem, setCurrentMem] = useState(0);
+  
+  function setMemsGrid ():number[][] {
+    const rowsRes:number[][] = [];
+    console.log(memStates.length)
+    if(memStates.length > 0){
+        const currentStateGrid = memStates[val][currentMem];
+        for (let i = 0; i < currentStateGrid.length; i+=16) {
+            const tempRow = [];
+            for (let j = 0; j < 16; j++) {
+                if(currentStateGrid[i+j] !== undefined){
+                    tempRow.push(currentStateGrid[i+j])
+                }else{
+                    tempRow.push(0);
+                }
+            }
+            rowsRes.push(tempRow)
+        }
+      }
+      console.log(rowsRes)
+      return rowsRes;
+  }
+  function setwasmMems(wasmStores: execTypes.storeProducePatches) {
+    const memBufferArrays = buildMemStatesArrays(wasmStores);
+    setMemStates(memBufferArrays);
+  }
   async function run(){
     const paramsCount = currentWasmType.parameters.length;
     // console.log("exports",wasmInstance.exportsTT);
     // console.log("instance",wasmInstance);
     // console.log("funcname", funcname);
-    console.log(params.length, paramsCount);
     if(params.length < paramsCount){
       setShowParamsAlert(true);
       return;
@@ -84,27 +110,21 @@ function App() {
     setWasmStores(res.stores);
     setwasmStates(buildStateStrings(res.stores, customSec));
     setwasmPatches(buildPatchesStrings(res.stores, wasmInstance.custom as custom[]));
-    setwasmMemsStrings(res.stores);
     setwasmMems(res.stores);
     setVal(0);
   }
 
-  function setwasmMemsStrings(wasmStores: execTypes.storeProducePatches) {
-    const memBufferStrings = buildMemStatesStrings(wasmStores);
-    setMemStatesStrings(memBufferStrings);
-  }
-  function setwasmMems(wasmStores: execTypes.storeProducePatches) {
-    const memBufferArrays = buildMemStatesArrays(wasmStores);
-    setMemStates(memBufferArrays);
-  }
+  // function setwasmMemsStrings(wasmStores: execTypes.storeProducePatches) {
+  //   const memBufferStrings = buildMemStatesStrings(wasmStores);
+  //   setMemStatesStrings(memBufferStrings);
+  // }
+  
 
   useEffect(() => {
     if(filename !== ''){
       updateWasm(filename);
       setWatOpen(true);
     }
-    
-
   }, [filename])
 
   return (
@@ -118,7 +138,8 @@ function App() {
           filename={filename}
           setFilename={setFilename}
           wasmInstance={wasmInstance}
-          showParamsAlert={ShowParamsAlert}/>
+          showParamsAlert={ShowParamsAlert}
+          />
         <MuiInstructions/>
         <MuiFunctionSelector 
           setFunc={setFuncname} 
@@ -138,14 +159,24 @@ function App() {
           wasmStates={wasmStates} 
           wasmInstance={wasmInstance} 
           watText={watText} 
-          memStates={memStates}/>
+          memStates={memStates}
+          />
         <MuiPatchesView 
           wasmPatches={wasmPatches} 
-          val={val}/>
-        <MuiMemView/>
+          val={val}
+          />
+        <MuiMemView 
+          memStates={memStates} 
+          setMemsGrid={setMemsGrid}
+          currentMem={currentMem}
+          setCurrentMem={setCurrentMem}
+          val={val} 
+        />
     </div>
   );
 }
+
+// Wasm functions
 
 async function instantiateModule(filename:string):Promise<execTypes.WebAssemblyMtsInstantiatedSource>{
   const buffer = await getWasm(`${filename}.wasm`);
