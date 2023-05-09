@@ -3,12 +3,15 @@ import { useState } from 'react'
 import { Collapse, Container, IconButton, Typography } from '@mui/material';
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
-function Codeview(props: {watText:string}) {
+function Codeview(props: {
+    watText:string,
+    watOpen:boolean,
+    setWatOpen: (b:boolean)=>void
+    }) {
     const watTextAsArray = props.watText.split('\n');
-    const [open, setOpen] = useState(true);
 
     function collapseContainer(){
-            setOpen(!open)
+            props.setWatOpen(!props.watOpen)
       }
   return (
     <Container sx={{
@@ -18,25 +21,25 @@ function Codeview(props: {watText:string}) {
         <Typography variant="h6" align='center'>
         <IconButton onClick={collapseContainer}>
             <KeyboardArrowDownIcon sx={{
-                display: open? 'inline-block' : 'none'
+                display: props.watOpen? 'inline-block' : 'none'
             }}
             />
             <KeyboardArrowUpIcon sx={{
-                display: open? 'none' : 'inline-block'
+                display: props.watOpen? 'none' : 'inline-block'
             }}/>
         </IconButton>
          WebAssembly Text Format
          <IconButton onClick={collapseContainer}>
             <KeyboardArrowDownIcon sx={{
-                display: open? 'inline-block' : 'none'
+                display: props.watOpen? 'inline-block' : 'none'
             }}
           />
             <KeyboardArrowUpIcon sx={{
-                display: open? 'none' : 'inline-block'
+                display: props.watOpen? 'none' : 'inline-block'
             }}/>
         </IconButton>
         </Typography>
-        <Collapse in={open} sx={{paddingTop:"5px"}}>
+        <Collapse in={props.watOpen} sx={{paddingTop:"5px"}}>
             <pre className="WatText">
                 {watTextAsArray.map(row => 
                 <><span className="lineNum">
