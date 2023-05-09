@@ -1,4 +1,4 @@
-import { Alert, Collapse, Container, IconButton } from '@mui/material'
+import { Alert, Collapse, Container, IconButton, useMediaQuery } from '@mui/material'
 import { useEffect, useState } from 'react'
 import UploadFileIcon from '@mui/icons-material/UploadFile';
 import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
@@ -21,6 +21,8 @@ function ActionButtons (props:{
       
   }){
 
+  const matches = useMediaQuery('(min-width:800px)');
+  
   const [openWarning, setOpenWarning] = useState(false);
   const [visibleInputs, setVisibleInputs] = useState(false);
   const [funcsCount, setFuncsCount] = useState(0);
@@ -64,31 +66,32 @@ function ActionButtons (props:{
       justifyContent:'space-between',
       borderBottom:'1px solid lightgrey'
     }}>
-        <IconButton size='small' color='primary'>
-            Import<UploadFileIcon/>
+        <IconButton size={matches?'large':'small'} color='primary'>
+            <UploadFileIcon/>Import<UploadFileIcon/>
         </IconButton>
-        <IconButton size='small' onClick={handleOpenExamples}
+
+        <IconButton size={matches?'large':'small'} onClick={handleOpenExamples}
           sx={{
-            color:'#b26a00',
+            color:'#b26a00'
           }}
         >
-            Examples<FolderOpenIcon/>
+            <FolderOpenIcon/>Examples<FolderOpenIcon/>
         </IconButton>
         
-        <IconButton size='small' onClick={()=>props.setwatText('')}
+        <IconButton size={matches?'large':'small'} onClick={()=>props.setwatText('')}
           sx={{
             color:'gray',
           }}
         >
-            Clear<DeleteOutlineIcon/>
+            <DeleteOutlineIcon/>Clear<DeleteOutlineIcon/>
         </IconButton>
 
-        <IconButton size='small' onClick={executeRunButton}
+        <IconButton size={matches?'large':'small'} onClick={executeRunButton}
           sx={{
             color:'#B81414',
           }}
         >
-            Run<KeyboardReturnIcon/>
+            <KeyboardReturnIcon/>Run<KeyboardReturnIcon/>
         </IconButton>
     </Container>
 
