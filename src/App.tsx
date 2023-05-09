@@ -49,7 +49,11 @@ function App() {
     setWasmModule(instSource.module);
   }
 
+  // Collapsers hooks
   const [ShowParamsAlert, setShowParamsAlert] = useState(false);
+  const [watOpen, setWatOpen] = useState(false);
+  const [paramsOpen, setParamsOpen] = useState(false);
+
   async function run(){
     const paramsCount = currentWasmType.parameters.length;
     // console.log("exports",wasmInstance.exportsTT);
@@ -93,8 +97,12 @@ function App() {
   }
 
   useEffect(() => {
-    if(filename !== '')
-    updateWasm(filename)
+    if(filename !== ''){
+      updateWasm(filename);
+      setWatOpen(true);
+    }
+    
+
   }, [filename])
 
   return (
@@ -116,9 +124,11 @@ function App() {
           wasmModule={wasmModule} 
           wasmStores={wasmStores} 
           updateWasm={updateWasm} 
-          setCurrentWasmType={setCurrentWasmType}/>
-        <MuiCodeView watText={watText}/>
-        <MuiEnterParams currWasmType={currentWasmType} params={params} setParams={setParams}/>
+          setCurrentWasmType={setCurrentWasmType}
+          setParamsOpen={setParamsOpen}
+          />
+        <MuiEnterParams currWasmType={currentWasmType} params={params} setParams={setParams} paramsOpen={paramsOpen} setParamsOpen={setParamsOpen}/>
+        <MuiCodeView watText={watText} watOpen={watOpen} setWatOpen={setWatOpen}/>
         <MuiStackView 
           val={val} 
           setVal={setVal}
