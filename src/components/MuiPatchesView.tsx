@@ -16,7 +16,15 @@ function MuiPatchesView (props:{
     }
     
     let printPatches = () => {
-        return props.wasmPatches[props.val].description.map(desc => 
+        const patchesDesc = props.wasmPatches[props.val].description;
+        if(patchesDesc === undefined){
+            return <Typography variant='subtitle1' sx={{
+                border:'2px solid grey',
+                paddingY:'5px',
+              }}>No patches for this state</Typography>
+        }
+        
+        return patchesDesc.map(desc => 
             <Typography variant='subtitle1' sx={{
                 border:'2px solid grey',
                 paddingY:'5px',
