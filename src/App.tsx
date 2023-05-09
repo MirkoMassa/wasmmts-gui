@@ -17,6 +17,8 @@ import { Alert, Collapse, Container, IconButton } from '@mui/material';
 import MuiParamsAltert from './components/alterts/MuiParamsAlert';
 import MuiParamsAlert from './components/alterts/MuiParamsAlert';
 import MuiInstructions from './components/MuiInstructions';
+import MuiPatchesView from './components/MuiPatchesView';
+import MuiMemView from './components/MuiMemView';
 
 
 function App() {
@@ -137,6 +139,10 @@ function App() {
           wasmInstance={wasmInstance} 
           watText={watText} 
           memStates={memStates}/>
+        <MuiPatchesView 
+          wasmPatches={wasmPatches} 
+          val={val}/>
+        <MuiMemView/>
     </div>
   );
 }
