@@ -28,7 +28,10 @@ function MuiEnterParams(props:{
         paddingY:'16px',
         borderBottom:'1px solid lightgrey'
         }}>
-        <Typography variant="h6" align='center'>
+        <Typography variant="h6" align='center'
+            className='Titles' 
+            onClick={collapseContainer}
+        >
         <IconButton onClick={collapseContainer}>
             <KeyboardArrowDownIcon sx={{
                 display: props.paramsOpen? 'inline-block' : 'none'
@@ -50,8 +53,7 @@ function MuiEnterParams(props:{
         </IconButton>
         </Typography>
 
-        <Collapse in={props.paramsOpen} >
-            
+        <Collapse in={props.paramsOpen}>
                 {props.currWasmType.parameters && 
                 props.currWasmType.parameters.map((type, i) =>
                     <FormControl fullWidth required>

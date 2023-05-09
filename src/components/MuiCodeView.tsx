@@ -18,7 +18,10 @@ function Codeview(props: {
         paddingY:'16px',
         borderBottom:'1px solid lightgrey'
     }}>
-        <Typography variant="h6" align='center'>
+        <Typography variant="h6" align='center'
+            className='Titles' 
+            onClick={collapseContainer}
+        >
         <IconButton onClick={collapseContainer}>
             <KeyboardArrowDownIcon sx={{
                 display: props.watOpen? 'inline-block' : 'none'

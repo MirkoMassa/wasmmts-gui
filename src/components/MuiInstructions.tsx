@@ -7,13 +7,16 @@ import KeyboardReturnIcon from '@mui/icons-material/KeyboardReturn';
 
 function MuiInstructions() {
     const [openInstructions, setOpenInstructions] = useState(false);
-    function collapseInstructions(){
+    function collapseContainer(){
         setOpenInstructions(!openInstructions)
       }
     return (
         <Container sx={{paddingY:'10px', borderBottom:'1px solid lightgrey'}}>
-            <Typography variant="h6" align='center'>
-            <IconButton onClick={collapseInstructions}>
+            <Typography variant="h6" align='center'
+                className='Titles' 
+                onClick={collapseContainer}
+            >
+            <IconButton onClick={collapseContainer}>
                 <KeyboardArrowDownIcon sx={{
                     display: openInstructions? 'inline-block' : 'none'
                 }}
@@ -23,7 +26,7 @@ function MuiInstructions() {
                 }}/>
             </IconButton>
             Instructions
-            <IconButton onClick={collapseInstructions}>
+            <IconButton onClick={collapseContainer}>
                 <KeyboardArrowDownIcon sx={{
                     display: openInstructions? 'inline-block' : 'none'
                 }}
