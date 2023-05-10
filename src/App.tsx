@@ -61,15 +61,21 @@ function App() {
   const [execToggler, setExecToggler] = useState(true);
 
   // Mems
-  const [memStates, setMemStates] = useState([] as number[][][]);
+  type threednumberarr = number[][][]
+  const [memStates, setMemStates] = useState([] as threednumberarr);
   const [memStatesRows, setMemStatesRows] = useState([] as number[][])
   const [currentMem, setCurrentMem] = useState(0);
   
   function setMemsGrid ():number[][] {
     const rowsRes:number[][] = [];
-    console.log(memStates.length)
-    if(memStates.length > 0){
+
+    //checking if memory is involved in this state
+    if(Array.isArray(memStates[0][0]) &&
+      memStates !== undefined && 
+      memStates.length > 0){
+
         const currentStateGrid = memStates[val][currentMem];
+        
         for (let i = 0; i < currentStateGrid.length; i+=16) {
             const tempRow = [];
             for (let j = 0; j < 16; j++) {
@@ -82,7 +88,6 @@ function App() {
             rowsRes.push(tempRow)
         }
       }
-      console.log(rowsRes)
       return rowsRes;
   }
   function setwasmMems(wasmStores: execTypes.storeProducePatches) {
@@ -114,11 +119,12 @@ function App() {
       const customSec:any = wasmInstance.custom;
 
       const res = await func(params);
+      setVal(0);
       setWasmStores(res.stores);
       setwasmStates(buildStateStrings(res.stores, customSec));
       setwasmPatches(buildPatchesStrings(res.stores, wasmInstance.custom as custom[]));
       setwasmMems(res.stores);
-      setVal(0);
+      
     }else{
       const func = wasmInstance.exports[funcname];
       const res:number[] | bigint[] | number | bigint = await func(params);
