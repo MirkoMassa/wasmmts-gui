@@ -25,7 +25,7 @@ function MuiInstructions() {
                     display: openInstructions? 'none' : 'inline-block'
                 }}/>
             </IconButton>
-            Instructions
+            How does it work?
             <IconButton onClick={collapseContainer}>
                 <KeyboardArrowDownIcon sx={{
                     display: openInstructions? 'inline-block' : 'none'
