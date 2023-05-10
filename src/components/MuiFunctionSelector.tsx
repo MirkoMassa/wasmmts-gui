@@ -48,7 +48,8 @@ function MuiFunctionSelector (props:{
       
   return (
     <Container sx={{
-        paddingY:'16px'
+        paddingY:'16px',
+        borderBottom:'1px solid lightgrey'
     }}>
         <FormControl fullWidth>
         <InputLabel id="SelectorLabel">Functions</InputLabel>
