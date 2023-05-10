@@ -10,15 +10,17 @@ import MuiTopbar from './components/navbar/MuiTopbar';
 import ActionButtons from './components/MuiActionButtons';
 import MuiCodeView from './components/MuiCodeView';
 import MuiFunctionSelector from './components/MuiFunctionSelector';
-import MuiStackView from './components/MuiStackView';
-import MuiStateSlider from './components/MuiStateSlider';
+import MuiStackView from './components/TTexecution/MuiStackView';
+import MuiStateSlider from './components/TTexecution/MuiStateSlider';
 import MuiEnterParams from './components/MuiEnterParams';
 import { Alert, Collapse, Container, IconButton } from '@mui/material';
 import MuiParamsAltert from './components/alterts/MuiParamsAlert';
 import MuiParamsAlert from './components/alterts/MuiParamsAlert';
 import MuiInstructions from './components/MuiInstructions';
-import MuiPatchesView from './components/MuiPatchesView';
-import MuiMemView from './components/MuiMemView';
+import MuiPatchesView from './components/TTexecution/MuiPatchesView';
+import MuiMemView from './components/TTexecution/MuiMemView';
+import TTexecutionWrapper from './components/TTexecutionWrapper';
+import ExecutionWrapper from './components/ExecutionWrapper';
 
 
 function App() {
@@ -33,8 +35,7 @@ function App() {
   const [wasmPatches, setwasmPatches] = useState([] as patchesDescriptor[]);
   const [val, setVal] = useState(-1);
 
-  const [currentWasmType, setCurrentWasmType] = useState({} as WasmFuncType);
-  const [params, setParams] = useState([] as number[]);
+  
 
 
   async function updateWasm(filename:string){
@@ -48,11 +49,16 @@ function App() {
     setWasmModule(instSource.module);
   }
 
-  // Collapsers hooks
+  // Returns & types hooks
+  const [funcReturns, setFuncReturns] = useState([] as (number | bigint)[]);
+  const [currentWasmType, setCurrentWasmType] = useState({} as WasmFuncType);
+  const [params, setParams] = useState([] as number[]);
+
+  // Collapsers hooks & togglers
   const [ShowParamsAlert, setShowParamsAlert] = useState(false);
   const [watOpen, setWatOpen] = useState(false);
   const [paramsOpen, setParamsOpen] = useState(false);
-
+  const [execToggler, setExecToggler] = useState(true);
 
   // Mems
   const [memStates, setMemStates] = useState([] as number[][][]);
@@ -103,15 +109,31 @@ function App() {
       }
     }
     //assign func
-    const func = wasmInstance.exportsTT[funcname];
-    const customSec:any = wasmInstance.custom;
+    if(execToggler){
+      const func = wasmInstance.exportsTT[funcname];
+      const customSec:any = wasmInstance.custom;
 
-    const res = await func(params);
-    setWasmStores(res.stores);
-    setwasmStates(buildStateStrings(res.stores, customSec));
-    setwasmPatches(buildPatchesStrings(res.stores, wasmInstance.custom as custom[]));
-    setwasmMems(res.stores);
-    setVal(0);
+      const res = await func(params);
+      setWasmStores(res.stores);
+      setwasmStates(buildStateStrings(res.stores, customSec));
+      setwasmPatches(buildPatchesStrings(res.stores, wasmInstance.custom as custom[]));
+      setwasmMems(res.stores);
+      setVal(0);
+    }else{
+      const func = wasmInstance.exports[funcname];
+      const res:number[] | bigint[] | number | bigint = await func(params);
+      
+
+      if(res instanceof Array){
+        setFuncReturns(res);
+      }else{
+        const resArray = [];
+        resArray.push(res);
+        setFuncReturns(resArray);
+      }
+    }
+
+    
   }
 
   // function setwasmMemsStrings(wasmStores: execTypes.storeProducePatches) {
@@ -145,6 +167,8 @@ function App() {
           setFilename={setFilename}
           wasmInstance={wasmInstance}
           showParamsAlert={ShowParamsAlert}
+          execToggler={execToggler}
+          setExecToggler={setExecToggler}
           />
         <MuiFunctionSelector 
           setFunc={setFuncname} 
@@ -155,28 +179,26 @@ function App() {
           setCurrentWasmType={setCurrentWasmType}
           setParamsOpen={setParamsOpen}
           />
+        {!execToggler ? <ExecutionWrapper
+          funcReturns={funcReturns}
+          currentWasmType={currentWasmType}
+        /> : <></>}
         <MuiEnterParams currWasmType={currentWasmType} params={params} setParams={setParams} paramsOpen={paramsOpen} setParamsOpen={setParamsOpen}/>
         <MuiCodeView watText={watText} watOpen={watOpen} setWatOpen={setWatOpen}/>
-        <MuiStackView 
+        
+        {/* If time travel execution is enabled */}
+        {execToggler ? <TTexecutionWrapper
           val={val} 
           setVal={setVal}
-          wasmStatesLength={wasmStates.length} 
-          wasmStates={wasmStates} 
-          wasmInstance={wasmInstance} 
-          watText={watText} 
+          wasmInstance={wasmInstance}
+          wasmStates={wasmStates}
+          watText={watText}
           memStates={memStates}
-          />
-        <MuiPatchesView 
-          wasmPatches={wasmPatches} 
-          val={val}
-          />
-        <MuiMemView 
-          memStates={memStates} 
+          wasmPatches={wasmPatches}
           setMemsGrid={setMemsGrid}
           currentMem={currentMem}
           setCurrentMem={setCurrentMem}
-          val={val} 
-        />
+        /> : <></>}
     </div>
   );
 }
