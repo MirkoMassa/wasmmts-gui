@@ -1,4 +1,4 @@
-import { Alert, Collapse, Container, IconButton, useMediaQuery } from '@mui/material'
+import { Alert, Collapse, Container, FormControlLabel, IconButton, Switch, Typography, useMediaQuery } from '@mui/material'
 import { useEffect, useState } from 'react'
 import UploadFileIcon from '@mui/icons-material/UploadFile';
 import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
@@ -16,8 +16,10 @@ function ActionButtons (props:{
       setFilename: (f:string) => void,
 
       wasmInstance:WebAssemblyMtsInstance,
-      showParamsAlert: boolean
+      showParamsAlert: boolean,
       
+      execToggler: boolean,
+      setExecToggler: (b:boolean) => void
   }){
 
   const matches = useMediaQuery('(min-width:800px)');
@@ -47,6 +49,9 @@ function ActionButtons (props:{
   function handleClear(){
     props.setFilename('');
   }
+  function handleRunSwitch(){
+    props.setExecToggler(!props.execToggler)
+  }
 
   useEffect(() => {
     const count = props.wasmInstance.exportsTT !== undefined 
@@ -58,20 +63,22 @@ function ActionButtons (props:{
   }, [props.wasmInstance])
   
   return (
-    <Container>
+  <Container>
 
     <Container sx={{
       display:'flex',
+      flexWrap:'wrap',
       paddingY:'16px',
       paddingX:'0px',
-      gap: '10px',
       justifyContent:'space-between',
       borderBottom:'1px solid lightgrey'
     }}>
+        {/* IMPORT BTN */}
         <IconButton size={matches?'large':'small'} color='primary'>
             Import<UploadFileIcon/>
         </IconButton>
 
+        {/* EXAMPLES BTN */}
         <IconButton size={matches?'large':'small'} onClick={handleOpenExamples}
           sx={{
             color:'#b26a00'
@@ -79,7 +86,8 @@ function ActionButtons (props:{
         >
             Examples<FolderOpenIcon/>
         </IconButton>
-        
+
+        {/* CLEAR BTN */}
         <IconButton size={matches?'large':'small'} onClick={handleClear}
           sx={{
             color:'gray',
@@ -88,6 +96,7 @@ function ActionButtons (props:{
             Clear<DeleteOutlineIcon/>
         </IconButton>
 
+        {/* RUN BTN */}
         <IconButton size={matches?'large':'small'} onClick={executeRunButton}
           sx={{
             color:'#B81414',
@@ -95,6 +104,16 @@ function ActionButtons (props:{
         >
             Run<KeyboardReturnIcon/>
         </IconButton>
+
+        {/* TOGGLER SWITCH */}
+        <div className='LineBreak'/>
+        <FormControlLabel sx={{width:'100%'}}
+          control={<Switch defaultChecked onClick={handleRunSwitch}/>}
+          label="Toggle Time Travel execution"
+          labelPlacement="bottom"
+        />
+        
+        
     </Container>
 
     {props.showParamsAlert ? 
@@ -124,7 +143,7 @@ function ActionButtons (props:{
       </Collapse>
     </Container>
     
-    </Container>
+  </Container>
   )
 }
 
