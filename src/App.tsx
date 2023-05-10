@@ -124,23 +124,28 @@ function App() {
     if(filename !== ''){
       updateWasm(filename);
       setWatOpen(true);
+    }else{
+      setwasmStates([]);
+      setWasmStores({} as execTypes.storeProducePatches);
+      setwasmPatches([] as patchesDescriptor[]);
+      setwatText('');
+      setWasmInstance({} as execTypes.WebAssemblyMtsInstance);
+      setWasmModule({} as execTypes.WebAssemblyMtsModule);
     }
   }, [filename])
 
   return (
     <div className="App">
         <MuiTopbar/>
-        
+        <MuiInstructions/>
         <ActionButtons 
           run={run} 
-          setwatText={setwatText} 
           funcName={funcname}
           filename={filename}
           setFilename={setFilename}
           wasmInstance={wasmInstance}
           showParamsAlert={ShowParamsAlert}
           />
-        <MuiInstructions/>
         <MuiFunctionSelector 
           setFunc={setFuncname} 
           wasmInstance={wasmInstance} 
