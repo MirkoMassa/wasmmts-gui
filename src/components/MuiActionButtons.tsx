@@ -10,7 +10,6 @@ import FolderOpenIcon from '@mui/icons-material/FolderOpen';
 import MuiExamples from './MuiExamples';
 function ActionButtons (props:{
       run:(paramsCount:number) => void,
-      setwatText:(filename:string) => void,
       funcName:string,
 
       filename: string,
@@ -45,6 +44,9 @@ function ActionButtons (props:{
   function handleOpenExamples(){
     setOpenExamples(!openExamples)
   }
+  function handleClear(){
+    props.setFilename('');
+  }
 
   useEffect(() => {
     const count = props.wasmInstance.exportsTT !== undefined 
@@ -78,7 +80,7 @@ function ActionButtons (props:{
             Examples<FolderOpenIcon/>
         </IconButton>
         
-        <IconButton size={matches?'large':'small'} onClick={()=>props.setwatText('')}
+        <IconButton size={matches?'large':'small'} onClick={handleClear}
           sx={{
             color:'gray',
           }}
