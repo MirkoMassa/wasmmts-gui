@@ -20,7 +20,10 @@ function MuiMemView (props:{
     const [memsRows, setMemsRows] = useState([] as number[][]);
 
     useEffect(() => {
-        setMemsRows(props.setMemsGrid());
+        const memsGrid = props.setMemsGrid()
+        if(memsGrid !== undefined){
+            setMemsRows(memsGrid);
+        }
     }, [props.val])
     
   return (
