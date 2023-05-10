@@ -8,7 +8,7 @@ import ArrowCircleRightOutlinedIcon from '@mui/icons-material/ArrowCircleRightOu
 function MuiStateSlider (props: {
       val:number, 
       setVal:(val:number) => void,
-      wasmStatesLength: number, 
+      wasmStatesLength: number,
     }) {
     const[isRunning, setIsRunning] = useState(false);
     

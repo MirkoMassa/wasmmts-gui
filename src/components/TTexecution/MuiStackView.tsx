@@ -30,7 +30,12 @@ function MuiStackView(props: {
       borderBottom:'1px solid lightgrey',
       maxHeight:'60vh'
       }}>
-        <MuiStateSlider val={props.val} setVal={props.setVal} wasmStatesLength={props.wasmStatesLength}/>
+        <MuiStateSlider 
+          val={props.val} 
+          setVal={props.setVal} 
+          wasmStatesLength={props.wasmStatesLength}
+        />
+        
         <Typography variant="h5" align='center'>
         <LayersIcon/> Stack <LayersIcon/> 
         </Typography>
