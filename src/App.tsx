@@ -69,9 +69,18 @@ function App() {
   function setMemsGrid ():number[][] {
     const rowsRes:number[][] = [];
 
+    // existence checking
+    if(memStates === undefined){
+      return rowsRes;
+    }
+    if(memStates[0] === undefined){
+      return rowsRes;
+    }
+    if(memStates[0][0] === undefined){
+      return rowsRes;
+    }
     //checking if memory is involved in this state
-    if(Array.isArray(memStates[0][0]) &&
-      memStates !== undefined && 
+    if(memStates !== undefined && 
       memStates.length > 0){
 
         const currentStateGrid = memStates[val][currentMem];
