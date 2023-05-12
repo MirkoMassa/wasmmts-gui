@@ -1,4 +1,4 @@
-import { AppBar, Box, Container, Drawer, IconButton, Stack, Toolbar, Typography } from '@mui/material'
+import { AppBar, Box, Container, Drawer, IconButton, Stack, Toolbar, Typography, useMediaQuery } from '@mui/material'
 import MenuIcon from '@mui/icons-material/Menu';
 import GitHubIcon from '@mui/icons-material/GitHub';
 import LinkedInIcon from '@mui/icons-material/LinkedIn';
@@ -6,6 +6,8 @@ import CloseIcon from '@mui/icons-material/Close';
 import { useState } from 'react'
 
 const MuiTopbar = () => {
+    const matches = useMediaQuery('(min-width:600px)');
+    
     const [open, setOpen] = useState(false);
 
     const toggleDrawer = (open:boolean) => (event:KeyboardEvent) => {
@@ -31,7 +33,29 @@ const MuiTopbar = () => {
                 <Typography variant="h6" component="div" sx={{ flexGrow: 10 }} marginBottom='6px'>
                     WasmMTS
                 </Typography>
-                {/* @ts-ignore */}
+                
+                {/* desktop view icons */}
+                {matches? <Container disableGutters sx={{
+                        display:'flex',
+                        justifyContent:'flex-end',
+                        width:'100%',
+                        flexWrap: 'wrap',
+                        columnGap:'30px'
+                    }}>
+
+                    <IconButton href='https://github.com/MirkoMassa/wasmmTS' sx={{
+                        color: 'black'
+                    }}>
+                        <GitHubIcon htmlColor='black' fontSize='large'/>GitHub
+                    </IconButton>
+                    <IconButton href='https://www.linkedin.com/in/mirko-massa' sx={{
+                        color: '#FAFAFA'
+                    }}>
+                        <LinkedInIcon htmlColor='#FAFAFA' fontSize='large'/>LinkedIn
+                    </IconButton>
+                    <img src={require("../../images/logo.png")} alt="logo"/>
+                </Container> : <></>}
+
                 <IconButton 
                     edge='end'
                     sx={{ mr: 2, display: { xs: 'block', sm: 'none',}, }}
