@@ -3,6 +3,7 @@ import MenuIcon from '@mui/icons-material/Menu';
 import GitHubIcon from '@mui/icons-material/GitHub';
 import LinkedInIcon from '@mui/icons-material/LinkedIn';
 import CloseIcon from '@mui/icons-material/Close';
+import PersonIcon from '@mui/icons-material/Person';
 import { useState } from 'react'
 
 const MuiTopbar = () => {
@@ -43,10 +44,15 @@ const MuiTopbar = () => {
                         columnGap:'30px'
                     }}>
 
+                    <IconButton href='https://docs.google.com/document/d/e/2PACX-1vQ1sQbEurwEdNqOhjkcGRZwySb0gczGsSgIoZpNgyngGI11ZZMfywf0OZzNklt-Qa15yKSv54otZ8sJ/pub'
+                    sx={{color: '#FAFAFA'}}>
+                    <PersonIcon htmlColor='#FAFAFA' fontSize='large'/>My Resume
+                    </IconButton>
+
                     <IconButton href='https://github.com/MirkoMassa/wasmmTS' sx={{
-                        color: 'black'
+                        color: '#FAFAFA'
                     }}>
-                        <GitHubIcon htmlColor='black' fontSize='large'/>GitHub
+                        <GitHubIcon htmlColor='#FAFAFA' fontSize='large'/>GitHub
                     </IconButton>
                     <IconButton href='https://www.linkedin.com/in/mirko-massa' sx={{
                         color: '#FAFAFA'
@@ -82,7 +88,11 @@ const MuiTopbar = () => {
                         }} onClick={toggleDrawer(false)}>
                         <CloseIcon />
                         </IconButton>
-                        
+
+                        <IconButton href='https://docs.google.com/document/d/e/2PACX-1vQ1sQbEurwEdNqOhjkcGRZwySb0gczGsSgIoZpNgyngGI11ZZMfywf0OZzNklt-Qa15yKSv54otZ8sJ/pub'
+                        sx={{color: 'black'}}>
+                        <PersonIcon htmlColor='black' fontSize='large'/>My Resume
+                        </IconButton>
                         <IconButton href='https://github.com/MirkoMassa/wasmmTS' sx={{
                             color: 'black'
                         }}>
