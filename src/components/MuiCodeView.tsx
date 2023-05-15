@@ -6,12 +6,16 @@ import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
 function Codeview(props: {
     watText:string,
     watOpen:boolean,
-    setWatOpen: (b:boolean)=>void
+    setWatOpen: (b:boolean)=>void,
+    filename:string
     }) {
     const watTextAsArray = props.watText.split('\n');
 
     function collapseContainer(){
-            props.setWatOpen(!props.watOpen)
+            if(props.watText !== ''){
+                props.setWatOpen(!props.watOpen)
+            }
+            
       }
   return (
     <Container sx={{
