@@ -1,6 +1,6 @@
 import '../App.css';
 import { useState } from 'react'
-import { Collapse, Container, IconButton, Typography } from '@mui/material';
+import { AppBar, Collapse, Container, IconButton, Typography } from '@mui/material';
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
 function Codeview(props: {
@@ -47,6 +47,9 @@ function Codeview(props: {
         </IconButton>
         </Typography>
         <Collapse in={props.watOpen} sx={{paddingTop:"5px"}}>
+            <AppBar position='static' sx={{ bgcolor:'lightgrey'}}>
+                <Typography variant="subtitle1" color='black'>{props.filename}.wat</Typography>
+            </AppBar>
             <pre className="WatText">
                 {watTextAsArray.map(row => 
                 <><span className="lineNum">
