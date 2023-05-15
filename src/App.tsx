@@ -199,7 +199,11 @@ function App() {
           currentWasmType={currentWasmType}
         /> : <></>}
         <MuiEnterParams currWasmType={currentWasmType} params={params} setParams={setParams} paramsOpen={paramsOpen} setParamsOpen={setParamsOpen}/>
-        <MuiCodeView watText={watText} watOpen={watOpen} setWatOpen={setWatOpen}/>
+        <MuiCodeView watText={watText}
+        watOpen={watOpen}
+        setWatOpen={setWatOpen}
+        filename={filename}
+        />
         
         {/* If time travel execution is enabled */}
         {execToggler ? <TTexecutionWrapper
