@@ -12,7 +12,7 @@ function MuiFunctionSelector (props:{
         wasmInstance:WebAssemblyMtsInstance,
         wasmModule:execTypes.WebAssemblyMtsModule,
         wasmStores:execTypes.storeProducePatches,
-        updateWasm: (funcName:string) => void,
+        updateWasmExample: (funcName:string) => void,
         setCurrentWasmType: (wasmType: WasmFuncType) => void,
         setParamsOpen: (b:boolean) => void
     }) {
