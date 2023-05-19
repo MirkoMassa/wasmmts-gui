@@ -47,9 +47,11 @@ function Codeview(props: {
         </IconButton>
         </Typography>
         <Collapse in={props.watOpen} sx={{paddingTop:"5px"}}>
+            {/* filename label */}
             <AppBar position='static' sx={{ bgcolor:'lightgrey'}}>
                 <Typography variant="subtitle1" color='black'>{props.filename}.wat</Typography>
             </AppBar>
+            {/* actual code */}
             <pre className="WatText">
                 {watTextAsArray.map(row => 
                 <><span className="lineNum">
