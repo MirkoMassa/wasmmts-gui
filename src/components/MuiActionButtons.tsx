@@ -1,4 +1,4 @@
-import { Alert, Collapse, Container, FormControlLabel, IconButton, Switch, Typography, useMediaQuery } from '@mui/material'
+import { Alert, Collapse, Container, FormControlLabel, IconButton, Input, Switch, Tooltip, Typography, useMediaQuery } from '@mui/material'
 import { useEffect, useState } from 'react'
 import UploadFileIcon from '@mui/icons-material/UploadFile';
 import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
@@ -19,18 +19,39 @@ function ActionButtons (props:{
       showParamsAlert: boolean,
       
       execToggler: boolean,
-      setExecToggler: (b:boolean) => void
+      setExecToggler: (b:boolean) => void,
+
+      importedName: string,
+      setImportedName: (s:string) => void,
+      importedBuffer: ArrayBuffer,
+      setImportedBuffer: (ab:ArrayBuffer) => void
   }){
 
   const matches = useMediaQuery('(min-width:800px)');
   
   const [openWarning, setOpenWarning] = useState(false);
-  const [visibleInputs, setVisibleInputs] = useState(false);
   const [funcsCount, setFuncsCount] = useState(0);
   const [paramsCount, setParamsCount] = useState(0);
   
+  
   const [openError, setOpenError] = useState(false);
   const [openExamples, setOpenExamples] = useState(false);
+
+  async function handleImport(file:File){
+    if(file){
+      props.setImportedName(file.name);
+      const reader = new FileReader();
+      reader.readAsArrayBuffer(file);
+      reader.onerror = () => {
+        console.log(reader.error);
+      }
+      reader.onload = () => {
+        const importedBuffer:ArrayBuffer = reader.result as ArrayBuffer;
+        console.log("buffer", importedBuffer);
+        props.setImportedBuffer(importedBuffer);
+      }
+    }
+  }
 
   function executeRunButton(){
     if(props.funcName !== ''){
@@ -42,7 +63,6 @@ function ActionButtons (props:{
         setOpenWarning(true);
     }
   }
-
   function handleOpenExamples(){
     setOpenExamples(!openExamples)
   }
@@ -63,7 +83,14 @@ function ActionButtons (props:{
   }, [props.wasmInstance])
   
   return (
-  <Container>
+  <Container sx={{
+    paddingY:'16px'}}>
+    {props.importedName!=='' && <Container sx={{
+      paddingY:'16px',
+      border:'1px solid lightgrey',
+    }}>
+      <Typography variant='h6' align='center'>Selected: {props.importedName}</Typography>
+    </Container>}
 
     <Container sx={{
       display:'flex',
@@ -74,9 +101,25 @@ function ActionButtons (props:{
       borderBottom:'1px solid lightgrey'
     }}>
         {/* IMPORT BTN */}
-        <IconButton size={matches?'large':'small'} color='primary'>
-            Import<UploadFileIcon/>
-        </IconButton>
+        <label htmlFor='binary'>
+          <input
+            id='binary'
+            type='file'
+            accept="application/wasm"
+            multiple
+            style={{ position: 'fixed', top: '-100em' }}
+            onChange={(event) =>handleImport(event.target.files![0])}
+          />
+          <Tooltip title='Upload Files'>
+            <IconButton size={matches?'large':'small'}
+            color='primary'
+            component='span'
+            >
+              Import<UploadFileIcon/>
+            </IconButton>
+          </Tooltip>
+        
+        </label>
 
         {/* EXAMPLES BTN */}
         <IconButton size={matches?'large':'small'} onClick={handleOpenExamples}
