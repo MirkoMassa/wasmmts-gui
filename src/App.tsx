@@ -26,9 +26,13 @@ import ExecutionWrapper from './components/ExecutionWrapper';
 function App() {
   const [wasmStates, setwasmStates] = useState([] as stateDescriptor[]);
   const [wasmStores, setWasmStores] = useState({} as execTypes.storeProducePatches);
+  const [funcname, setFuncname] = useState('');
 
   const [filename, setFilename] = useState('');
-  const [funcname, setFuncname] = useState('');
+  
+  const [importedBuffer, setImportedBuffer] = useState({} as ArrayBuffer);
+  const [importedName, setImportedName] = useState('');
+
   const [wasmInstance, setWasmInstance] = useState({} as execTypes.WebAssemblyMtsInstance);
   const [wasmModule, setWasmModule] = useState({} as execTypes.WebAssemblyMtsModule);
   const [watText, setwatText] = useState('');
@@ -37,14 +41,23 @@ function App() {
 
   
 
-
-  async function updateWasm(filename:string){
+  async function updateWasmExample(filename:string){
     setwasmStates([]);
     setWasmStores({} as execTypes.storeProducePatches);
     setwasmPatches([] as patchesDescriptor[]);
     setFilename(filename);
     setwatText(await getWat(`${filename}.wat`));
-    const instSource = await instantiateModule(filename)
+    const instSource = await instantiateModule(filename);
+    setWasmInstance(instSource.instance);
+    setWasmModule(instSource.module);
+  }
+
+  async function updateWasmImport(filename:string){
+    setwasmStates([]);
+    setWasmStores({} as execTypes.storeProducePatches);
+    setwasmPatches([] as patchesDescriptor[]);
+    setFilename(filename);
+    const instSource = await instantiateModule();
     setWasmInstance(instSource.instance);
     setWasmModule(instSource.module);
   }
@@ -151,16 +164,25 @@ function App() {
     
   }
 
-  // function setwasmMemsStrings(wasmStores: execTypes.storeProducePatches) {
-  //   const memBufferStrings = buildMemStatesStrings(wasmStores);
-  //   setMemStatesStrings(memBufferStrings);
-  // }
+  async function instantiateModule(filename?:string):Promise<execTypes.WebAssemblyMtsInstantiatedSource>{
+    // not passing filename means it's an imported wasm
+    let buffer:ArrayBuffer;
+    filename ? buffer = await getWasm(`${filename}.wasm`) : buffer = importedBuffer;
+    
+    //@ts-ignore
+    const inst = await WASMMTS.instantiate(new Uint8Array(buffer));
+    console.log("inst",inst)
+    return inst;
+  }
   
 
   useEffect(() => {
-    if(filename !== ''){
-      updateWasm(filename);
-      setWatOpen(true);
+    if(importedBuffer !== undefined){
+      console.log(importedBuffer)
+      updateWasmImport(filename);
+    }else if(filename !== ''){
+        updateWasmExample(filename);
+        setWatOpen(true);
     }else{
       setwasmStates([]);
       setWasmStores({} as execTypes.storeProducePatches);
@@ -169,7 +191,7 @@ function App() {
       setWasmInstance({} as execTypes.WebAssemblyMtsInstance);
       setWasmModule({} as execTypes.WebAssemblyMtsModule);
     }
-  }, [filename])
+  }, [filename, importedBuffer])
 
   return (
     <div className="App">
@@ -184,13 +206,17 @@ function App() {
           showParamsAlert={ShowParamsAlert}
           execToggler={execToggler}
           setExecToggler={setExecToggler}
+          importedName={importedName}
+          setImportedName={setImportedName}
+          importedBuffer={importedBuffer}
+          setImportedBuffer={setImportedBuffer}
           />
         <MuiFunctionSelector 
           setFunc={setFuncname} 
           wasmInstance={wasmInstance} 
           wasmModule={wasmModule} 
           wasmStores={wasmStores} 
-          updateWasm={updateWasm} 
+          updateWasmExample={updateWasmExample} 
           setCurrentWasmType={setCurrentWasmType}
           setParamsOpen={setParamsOpen}
           />
@@ -222,16 +248,7 @@ function App() {
   );
 }
 
-// Wasm functions
-
-async function instantiateModule(filename:string):Promise<execTypes.WebAssemblyMtsInstantiatedSource>{
-  const buffer = await getWasm(`${filename}.wasm`);
-  //@ts-ignore
-  const inst = await WASMMTS.instantiate(new Uint8Array(buffer));
-  console.log("inst",inst)
-  return inst;
-}
-
+// Getter functions
 async function getWasm(path:string):Promise<ArrayBuffer>{
   const res:Response = await fetch(`./examples/${path}`);
   const wasmBuffer = await res.arrayBuffer();
