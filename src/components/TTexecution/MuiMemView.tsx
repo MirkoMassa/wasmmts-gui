@@ -10,11 +10,15 @@ function MuiMemView (props:{
     setCurrentMem:(n:number)=>void,
     val:number
 }) {
-    const [memOpen, setMemOpen] = useState(false)
+    const [memOpen, setMemOpen] = useState(false);
+
     function collapseContainer(){
-        setMemOpen(!memOpen)
-        console.log("memStates",props.memStates);
-        console.log("rows",memsRows);
+        if(props.setMemsGrid().length !== 0){
+            setMemOpen(!memOpen);
+            console.log("memStates",props.memStates);
+            console.log("rows",memsRows);
+        }
+        
     }
 
     const [memsRows, setMemsRows] = useState([] as number[][]);
