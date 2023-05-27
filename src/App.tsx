@@ -210,6 +210,7 @@ function App() {
           setImportedName={setImportedName}
           importedBuffer={importedBuffer}
           setImportedBuffer={setImportedBuffer}
+          setWatOpen={setWatOpen}
           />
         <MuiFunctionSelector 
           setFunc={setFuncname} 
