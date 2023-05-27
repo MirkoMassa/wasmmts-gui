@@ -177,8 +177,8 @@ function App() {
   
 
   useEffect(() => {
-    if(importedBuffer !== undefined){
-      console.log(importedBuffer)
+    console.log("imported buffer",importedBuffer)
+    if(Object.keys(importedBuffer).length !== 0){
       updateWasmImport(filename);
     }else if(filename !== ''){
         updateWasmExample(filename);
