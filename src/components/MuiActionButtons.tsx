@@ -109,8 +109,7 @@ function ActionButtons (props:{
       flexWrap:'wrap',
       paddingY:'16px',
       paddingX:'0px',
-      justifyContent:'space-between',
-      borderBottom:'1px solid lightgrey'
+      justifyContent:'space-between'
     }}>
         {/* IMPORT BTN */}
         <label htmlFor='binary'>
