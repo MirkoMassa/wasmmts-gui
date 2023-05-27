@@ -7,10 +7,12 @@ const exampleNames = ['call', 'fib', 'ifelsenest', 'loadstore', 'loop', 'multiAr
 function MuiExamples (props:{
     openExamples:boolean,
     filename: string,
-    setFilename: (f:string) => void
+    setFilename: (f:string) => void,
+    setImportedName: (f:string) => void
 }) {    
     const handleChange = async (event: SelectChangeEvent) => {
         props.setFilename(event.target.value as string);
+        props.setImportedName('');
     };
     return (
     <Collapse in={props.openExamples}>
