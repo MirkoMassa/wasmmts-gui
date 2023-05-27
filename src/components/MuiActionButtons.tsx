@@ -25,6 +25,7 @@ function ActionButtons (props:{
       setImportedName: (s:string) => void,
       importedBuffer: ArrayBuffer,
       setImportedBuffer: (ab:ArrayBuffer) => void
+      setWatOpen: (b:boolean) => void
   }){
 
   const matches = useMediaQuery('(min-width:800px)');
@@ -40,6 +41,10 @@ function ActionButtons (props:{
   async function handleImport(file:File){
     if(file){
       props.setImportedName(file.name);
+
+      // clearing everything else
+      handleClear();
+
       const reader = new FileReader();
       reader.readAsArrayBuffer(file);
       reader.onerror = () => {
@@ -68,6 +73,8 @@ function ActionButtons (props:{
   }
   function handleClear(){
     props.setFilename('');
+    setOpenExamples(false);
+    props.setWatOpen(false);
   }
   function handleRunSwitch(){
     props.setExecToggler(!props.execToggler)
@@ -85,11 +92,16 @@ function ActionButtons (props:{
   return (
   <Container sx={{
     paddingY:'16px'}}>
-    {props.importedName!=='' && <Container sx={{
+    {(props.importedName!=='' || props.filename !== '') && <Container sx={{
       paddingY:'16px',
       border:'1px solid lightgrey',
     }}>
-      <Typography variant='h6' align='center'>Selected: {props.importedName}</Typography>
+      <Typography variant='h6' align='center'>
+        Selected:{' '}
+        {props.importedName !== '' ? 
+        props.importedName : 
+        props.filename+'.wasm'}
+      </Typography>
     </Container>}
 
     <Container sx={{
@@ -162,7 +174,12 @@ function ActionButtons (props:{
     {props.showParamsAlert ? 
     <MuiParamsAlert openError={openError} setOpenError={setOpenError}/> 
     : null}
-    <MuiExamples openExamples={openExamples} filename={props.filename} setFilename={props.setFilename}/>
+    <MuiExamples 
+      openExamples={openExamples} 
+      filename={props.filename} 
+      setFilename={props.setFilename}
+      setImportedName={props.setImportedName}
+      />
 
     <Container>
       <Collapse in={openWarning} sx={{paddingTop:"5px"}}>
