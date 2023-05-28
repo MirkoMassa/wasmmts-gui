@@ -139,7 +139,6 @@ function App() {
     if(execToggler){
       const func = wasmInstance.exportsTT[funcname];
       const customSec:any = wasmInstance.custom;
-
       const res = await func(params);
       setVal(0);
       setWasmStores(res.stores);
@@ -177,8 +176,7 @@ function App() {
   
 
   useEffect(() => {
-    console.log("imported buffer",importedBuffer)
-    if(Object.keys(importedBuffer).length !== 0){
+    if(importedName !== ""){
       updateWasmImport(filename);
     }else if(filename !== ''){
         updateWasmExample(filename);
