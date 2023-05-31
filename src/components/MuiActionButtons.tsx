@@ -8,6 +8,7 @@ import { WebAssemblyMtsInstance } from 'wasmmts-a_wasm_interpreter/build/src/exe
 import MuiParamsAlert from './alterts/MuiParamsAlert';
 import FolderOpenIcon from '@mui/icons-material/FolderOpen';
 import MuiExamples from './MuiExamples';
+import { addFileToDB } from '../database';
 function ActionButtons (props:{
       run:(paramsCount:number) => void,
       funcName:string,
@@ -26,8 +27,9 @@ function ActionButtons (props:{
       importedBuffer: ArrayBuffer,
       setImportedBuffer: (ab:ArrayBuffer) => void
       setWatOpen: (b:boolean) => void
-  }){
 
+
+  }){
   const matches = useMediaQuery('(min-width:800px)');
   
   const [openWarning, setOpenWarning] = useState(false);
@@ -40,10 +42,10 @@ function ActionButtons (props:{
 
   async function handleImport(file:File){
     if(file){
-      props.setImportedName(file.name);
-
-      // clearing everything else
+      addFileToDB(file);
+      // clearing everything
       handleClear();
+      props.setImportedName(file.name);
 
       const reader = new FileReader();
       reader.readAsArrayBuffer(file);
@@ -73,6 +75,8 @@ function ActionButtons (props:{
   }
   function handleClear(){
     props.setFilename('');
+    props.setImportedName('');
+
     setOpenExamples(false);
     props.setWatOpen(false);
   }
@@ -91,7 +95,7 @@ function ActionButtons (props:{
   
   return (
   <Container sx={{
-    paddingY:'16px'}}>
+    paddingY:'16px', paddingBottom:'0px'}}>
     {(props.importedName!=='' || props.filename !== '') && <Container sx={{
       paddingY:'16px',
       border:'1px solid lightgrey',
