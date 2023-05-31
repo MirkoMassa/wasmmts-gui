@@ -1,15 +1,8 @@
-// @ts-ignore
-export function addFileToDB(file:File):void{
+export function dbReqRes(fileOrKey:File | string):void | Blob{
     
     const indexedDB = window.indexedDB || 
     // @ts-ignore
-    window.mozIndexedDB || 
-    // @ts-ignore
-    window.webkitIndexedDB ||
-    // @ts-ignore
-    window.msIndexedDB ||
-    // @ts-ignore
-    window.shimIndexedDB;
+    window.mozIndexedDB || window.webkitIndexedDB || window.msIndexedDB || window.shimIndexedDB;
     const request = indexedDB.open('wasmfiles', 2);
 
     request.onerror = (e) =>{
@@ -25,7 +18,6 @@ export function addFileToDB(file:File):void{
     request.onsuccess = (e) => {
         // @ts-ignore
         const db:IDBDatabase = e.target.result;
-        // Create an object store (if it doesn't exist)
         
         db.onerror = (e) => {
             // @ts-ignore
@@ -33,11 +25,16 @@ export function addFileToDB(file:File):void{
         }
         const transaction = db.transaction(['files'], "readwrite");
         const objStore = transaction.objectStore('files');
-        loadObj(db, objStore, transaction, file);
+        if(fileOrKey instanceof File){
+            storeObj(db, objStore, transaction, fileOrKey);
+        } else if (typeof fileOrKey == 'string'){
+            loadObj(db, objStore, transaction, fileOrKey);
+        }
+        
     }     
 }
 
-export function loadObj(db:IDBDatabase, 
+export function storeObj(db:IDBDatabase, 
     objStore:IDBObjectStore,
     transaction:IDBTransaction,
     file:File) {
@@ -48,7 +45,7 @@ export function loadObj(db:IDBDatabase,
 
     request.onerror = (e) => {
         // @ts-ignore
-        console.error('error', e.target.result);
+        console.error('Error while storing blob.', e.target.result);
     };
     request.onsuccess = (e) => {
         // @ts-ignore
@@ -56,7 +53,132 @@ export function loadObj(db:IDBDatabase,
     };
 
     transaction.oncomplete = () => {
-        console.log('Transaction completed.');
+        console.log('Storing transaction completed.');
         db.close();
     }
 };
+
+export function loadObj(db:IDBDatabase, 
+    objStore:IDBObjectStore,
+    transaction:IDBTransaction,
+    key:string):Blob | null {
+
+    const request = objStore.get(key);
+    request.onerror = (e) => {
+        // @ts-ignore
+        console.error('Error while retrieving blob.', e.target.result);
+    }
+    request.onsuccess = (e) => {
+        // @ts-ignore
+        const resBlob:Blob = e.target.result;
+        if(resBlob){
+            console.log(resBlob);
+            
+        } else {
+            console.log('File not found.');
+        }
+        transaction.oncomplete = () => {
+            console.log("Loading transaction completed");
+            db.close();
+        };
+        return resBlob;
+    }
+    return null;
+}
+
+export async function loadAllObj(): Promise<[string[], Blob[]]> {
+    try {
+        const [request, db] = await dbAccess()!;
+
+        return new Promise((resolve, reject) => {
+
+        const transaction = db.transaction(['files'], 'readonly');
+        const objStore = transaction.objectStore('files');
+        let resKeys:string[], resBlobs:Blob[];
+
+        objStore.getAllKeys().onsuccess = (e) => {
+            // @ts-ignore
+            resKeys = e.target.result;
+            transaction.oncomplete = () => {
+                console.log('loadingAllKeys transaction completed.');
+            };
+        }
+
+        objStore.getAll().onsuccess = (e) => {
+            // @ts-ignore
+            resBlobs = e.target.result;
+            transaction.oncomplete = () => {
+                console.log('loadingAll transaction completed.');
+                db.close();
+                resolve([resKeys, resBlobs]);
+            };
+        };
+
+        request.onerror = (event) => {
+            // @ts-ignore
+            console.error('Error creating/accessing db.', event.target.error);
+            // @ts-ignore
+            reject(event.target.error);
+        };
+        });
+    } catch (err) {
+        console.error('Error:', err);
+        throw err;
+    }
+}
+
+
+//@TODO
+export function removeObj(db:IDBDatabase, 
+    objStore:IDBObjectStore,
+    transaction:IDBTransaction,
+    key:string) {
+        
+    const request = objStore.get(key);
+    request.onerror = (e) => {
+        // @ts-ignore
+        console.error('Error while retrieving blob.', e.target.result);
+    }
+    request.onsuccess = (e) => {
+        // @ts-ignore
+        const resBlob:Blob = e.target.result;
+        if(resBlob){
+            console.log(resBlob);
+        } else {
+            console.log('File not found.');
+        }
+        transaction.oncomplete = function() {
+            console.log("Loading transaction completed");
+            db.close();
+        };
+    }
+}
+
+
+// normal db access for every operation
+function dbAccess(): Promise<[IDBOpenDBRequest, IDBDatabase]> {
+    
+    return new Promise ((res, reject) => {
+        // @ts-ignore
+        const indexedDB = window.indexedDB || window.mozIndexedDB || window.webkitIndexedDB ||window.msIndexedDB || window.shimIndexedDB;
+        
+        const request = indexedDB.open('wasmfiles', 2);
+        request.onerror = (e) =>{
+            console.error(`database request error: ${e}`);
+        }
+        request.onupgradeneeded = (e) => {
+            // @ts-ignore
+            const db:IDBDatabase = e.target.result;
+            if (!db.objectStoreNames.contains('files')) {
+                db.createObjectStore('files');
+            }
+            
+        }
+        request.onsuccess = (e) => {
+            // @ts-ignore
+            const db:IDBDatabase = e.target.result;
+            res([request, db]);
+        }
+    });
+
+}
