@@ -176,7 +176,7 @@ function App() {
   
 
   useEffect(() => {
-    if(importedName !== ""){
+    if(importedName !== ''){
       updateWasmImport(filename);
     }else if(filename !== ''){
         updateWasmExample(filename);
@@ -189,7 +189,7 @@ function App() {
       setWasmInstance({} as execTypes.WebAssemblyMtsInstance);
       setWasmModule({} as execTypes.WebAssemblyMtsModule);
     }
-  }, [filename, importedBuffer])
+  }, [filename, importedBuffer, importedName])
 
   return (
     <div className="App">
@@ -209,6 +209,7 @@ function App() {
           importedBuffer={importedBuffer}
           setImportedBuffer={setImportedBuffer}
           setWatOpen={setWatOpen}
+
           />
         <MuiFunctionSelector 
           setFunc={setFuncname} 
@@ -218,6 +219,8 @@ function App() {
           updateWasmExample={updateWasmExample} 
           setCurrentWasmType={setCurrentWasmType}
           setParamsOpen={setParamsOpen}
+          importedName={importedName}
+          filename={filename}
           />
         {!execToggler ? <ExecutionWrapper
           funcReturns={funcReturns}
