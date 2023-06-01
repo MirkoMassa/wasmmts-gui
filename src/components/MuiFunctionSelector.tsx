@@ -1,4 +1,4 @@
-import { FormControl, InputLabel, MenuItem, Select, SelectChangeEvent } from '@mui/material';
+import { Collapse, FormControl, InputLabel, MenuItem, Select, SelectChangeEvent } from '@mui/material';
 import { useEffect, useState } from 'react'
 import { WebAssemblyMtsInstance } from 'wasmmts-a_wasm_interpreter/build/src/exec/types';
 import * as execTypes from 'wasmmts-a_wasm_interpreter/build/src/exec/types'
@@ -14,7 +14,9 @@ function MuiFunctionSelector (props:{
         wasmStores:execTypes.storeProducePatches,
         updateWasmExample: (funcName:string) => void,
         setCurrentWasmType: (wasmType: WasmFuncType) => void,
-        setParamsOpen: (b:boolean) => void
+        setParamsOpen: (b:boolean) => void,
+        importedName: string,
+        filename: string
     }) {
     const wasmTypes = props.wasmModule.types;
     const wasmExports = props.wasmModule.exports;
@@ -22,7 +24,8 @@ function MuiFunctionSelector (props:{
 
     const [currentLabel, setCurrentLabel] = useState('');
     const [currParamsLength, setCurrParamsLength] = useState(0);
-    
+    const [openFunctions, setOpenFunctions] = useState(false);
+
     const handleChange = async (event: SelectChangeEvent) => {
         props.setFunc(event.target.value);
         setCurrentLabel(event.target.value as string);
@@ -32,7 +35,10 @@ function MuiFunctionSelector (props:{
     
 
       // setting number of params
-    useEffect(() => {
+   useEffect(() => {
+    if(props.importedName !== '' || props.filename !== ''){
+        setOpenFunctions(!openFunctions);
+    }
     if(wasmExports !== undefined){
         for (let i = 0; i < wasmExports.length; i++) {
             const exportInst = wasmExports[i];
@@ -44,14 +50,18 @@ function MuiFunctionSelector (props:{
             }
         }
     }
-    }, [wasmExports, currentLabel, funcAddresses, wasmTypes])
+}, [wasmExports, currentLabel, funcAddresses, wasmTypes])
       
   return (
+    
+    <Collapse in={openFunctions} sx={{borderTop:'1px solid lightgrey'}}>
     <Container sx={{
-        paddingY:'16px',
-        borderBottom:'1px solid lightgrey'
+    paddingY:'16px',
+    borderBottom:'1px solid lightgrey'
     }}>
+
         <FormControl fullWidth>
+            
         <InputLabel id="SelectorLabel">Functions</InputLabel>
         <Select
             labelId="Function selector"
@@ -70,6 +80,8 @@ function MuiFunctionSelector (props:{
         </Select>
         </FormControl>
     </Container>
+    </Collapse>
+    
 )
 }
 
