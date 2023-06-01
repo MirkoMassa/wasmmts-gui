@@ -39,8 +39,6 @@ function App() {
   const [wasmPatches, setwasmPatches] = useState([] as patchesDescriptor[]);
   const [val, setVal] = useState(-1);
 
-  
-
   async function updateWasmExample(filename:string){
     setwasmStates([]);
     setWasmStores({} as execTypes.storeProducePatches);
@@ -61,6 +59,15 @@ function App() {
     setWasmInstance(instSource.instance);
     setWasmModule(instSource.module);
   }
+  async function updateWasmStoredfile(filename:string, buffer:ArrayBuffer){
+    setwasmStates([]);
+    setWasmStores({} as execTypes.storeProducePatches);
+    setwasmPatches([] as patchesDescriptor[]);
+    setFilename(filename);
+    const instSource = await instantiateStoredFile(buffer);
+    setWasmInstance(instSource.instance);
+    setWasmModule(instSource.module);
+  }
 
   // Returns & types hooks
   const [funcReturns, setFuncReturns] = useState([] as (number | bigint)[]);
@@ -72,6 +79,8 @@ function App() {
   const [watOpen, setWatOpen] = useState(false);
   const [paramsOpen, setParamsOpen] = useState(false);
   const [execToggler, setExecToggler] = useState(true);
+  const [openExamples, setOpenExamples] = useState(false);
+  const [openStoredFiles, setOpenStoredFiles] = useState(false);
 
   // Mems
   type threednumberarr = number[][][]
@@ -173,6 +182,12 @@ function App() {
     console.log("inst",inst)
     return inst;
   }
+  async function instantiateStoredFile(buffer:ArrayBuffer):Promise<execTypes.WebAssemblyMtsInstantiatedSource>{
+    //@ts-ignore
+    const inst = await WASMMTS.instantiate(new Uint8Array(buffer));
+    console.log("inst",inst)
+    return inst;
+  }
   
 
   useEffect(() => {
@@ -194,7 +209,11 @@ function App() {
   return (
     <div className="App">
         <MuiTopbar/>
-        <MuiInstructions/>
+        <MuiInstructions
+          openExamples={openExamples}
+          setOpenExamples={setOpenExamples}
+          setOpenStoredFiles = {setOpenStoredFiles}
+        />
         <ActionButtons 
           run={run} 
           funcName={funcname}
@@ -209,8 +228,12 @@ function App() {
           importedBuffer={importedBuffer}
           setImportedBuffer={setImportedBuffer}
           setWatOpen={setWatOpen}
-
-          />
+          openExamples={openExamples}
+          setOpenExamples={setOpenExamples}
+          openStoredFiles={openStoredFiles}
+          setOpenStoredFiles={setOpenStoredFiles}
+          updateWasmStoredfile={updateWasmStoredfile}
+        />
         <MuiFunctionSelector 
           setFunc={setFuncname} 
           wasmInstance={wasmInstance} 
@@ -221,16 +244,23 @@ function App() {
           setParamsOpen={setParamsOpen}
           importedName={importedName}
           filename={filename}
-          />
+        />
         {!execToggler ? <ExecutionWrapper
           funcReturns={funcReturns}
           currentWasmType={currentWasmType}
         /> : <></>}
-        <MuiEnterParams currWasmType={currentWasmType} params={params} setParams={setParams} paramsOpen={paramsOpen} setParamsOpen={setParamsOpen}/>
-        <MuiCodeView watText={watText}
-        watOpen={watOpen}
-        setWatOpen={setWatOpen}
-        filename={filename}
+        <MuiEnterParams 
+          currWasmType={currentWasmType} 
+          params={params} 
+          setParams={setParams} 
+          paramsOpen={paramsOpen} 
+          setParamsOpen={setParamsOpen}
+        />
+        <MuiCodeView 
+          watText={watText}
+          watOpen={watOpen}
+          setWatOpen={setWatOpen}
+          filename={filename}
         />
         
         {/* If time travel execution is enabled */}
@@ -259,7 +289,12 @@ async function getWasm(path:string):Promise<ArrayBuffer>{
  
 async function getWat(path:string):Promise<string>{
   const res:Response = await fetch(`./examples/${path}`);
-  const watText = await res.text();
-  return watText;
+  if(res.status === 200){
+    const watText = await res.text();
+    return watText;
+  }else{
+    return '';
+  }
+  
 }
 export default App;
