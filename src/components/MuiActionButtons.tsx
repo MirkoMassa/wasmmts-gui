@@ -8,7 +8,8 @@ import { WebAssemblyMtsInstance } from 'wasmmts-a_wasm_interpreter/build/src/exe
 import MuiParamsAlert from './alterts/MuiParamsAlert';
 import FolderOpenIcon from '@mui/icons-material/FolderOpen';
 import MuiExamples from './MuiExamples';
-import { addFileToDB } from '../database';
+import { dbReqRes } from '../database';
+import MuiImportedFiles from './MuiImportedFiles';
 function ActionButtons (props:{
       run:(paramsCount:number) => void,
       funcName:string,
@@ -25,10 +26,16 @@ function ActionButtons (props:{
       importedName: string,
       setImportedName: (s:string) => void,
       importedBuffer: ArrayBuffer,
-      setImportedBuffer: (ab:ArrayBuffer) => void
-      setWatOpen: (b:boolean) => void
+      setImportedBuffer: (ab:ArrayBuffer) => void,
+      setWatOpen: (b:boolean) => void,
 
+      openExamples: boolean,
+      setOpenExamples: (b:boolean) => void,
 
+      openStoredFiles:boolean,
+      setOpenStoredFiles: (b:boolean) => void,
+
+      updateWasmStoredfile: (filename:string, buffer:ArrayBuffer) => void
   }){
   const matches = useMediaQuery('(min-width:800px)');
   
@@ -38,11 +45,11 @@ function ActionButtons (props:{
   
   
   const [openError, setOpenError] = useState(false);
-  const [openExamples, setOpenExamples] = useState(false);
 
   async function handleImport(file:File){
-    if(file){
-      addFileToDB(file);
+    if(file && file.type === 'application/wasm'){
+      // storing wasm in the db
+      dbReqRes(file);
       // clearing everything
       handleClear();
       props.setImportedName(file.name);
@@ -70,15 +77,19 @@ function ActionButtons (props:{
         setOpenWarning(true);
     }
   }
-  function handleOpenExamples(){
-    setOpenExamples(!openExamples)
+
+  function handleFiles(){
+    if(!props.openStoredFiles){
+      props.setOpenExamples(false);
+    }
+    props.setOpenStoredFiles(!props.openStoredFiles)
   }
+  
   function handleClear(){
     props.setFilename('');
     props.setImportedName('');
 
-    setOpenExamples(false);
-    props.setWatOpen(false);
+    props.setOpenExamples(false);
   }
   function handleRunSwitch(){
     props.setExecToggler(!props.execToggler)
@@ -136,13 +147,13 @@ function ActionButtons (props:{
         
         </label>
 
-        {/* EXAMPLES BTN */}
-        <IconButton size={matches?'large':'small'} onClick={handleOpenExamples}
+        {/* STORED FILES BTN */}
+        <IconButton size={matches?'large':'small'} onClick={handleFiles}
           sx={{
-            color:'#b26a00'
+            color:'#00a152'
           }}
         >
-            Examples<FolderOpenIcon/>
+            Stored files<FolderOpenIcon/>
         </IconButton>
 
         {/* CLEAR BTN */}
@@ -177,12 +188,23 @@ function ActionButtons (props:{
     {props.showParamsAlert ? 
     <MuiParamsAlert openError={openError} setOpenError={setOpenError}/> 
     : null}
+
+    {/* Examples collapse */}
     <MuiExamples 
-      openExamples={openExamples} 
+      openExamples={props.openExamples} 
       filename={props.filename} 
       setFilename={props.setFilename}
       setImportedName={props.setImportedName}
-      />
+    />
+    {/* Imported files collapse */}
+    <MuiImportedFiles
+      openStoredFiles={props.openStoredFiles}
+      setOpenStoredFiles={props.setOpenStoredFiles}
+      filename={props.filename}
+      setFilename={props.setFilename}
+      setImportedName={props.setImportedName}
+      updateWasmStoredfile={props.updateWasmStoredfile}
+    />
 
     <Container>
       <Collapse in={openWarning} sx={{paddingTop:"5px"}}>
