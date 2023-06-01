@@ -1,8 +1,8 @@
 import { Box, Collapse, Container, FormControl, IconButton, Input, Typography } from '@mui/material'
-import React, { useState } from 'react'
 import { WasmFuncType } from 'wasmmts-a_wasm_interpreter/build/src/exec/wasmm'
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
+import { useEffect } from 'react';
 
 function MuiEnterParams(props:{
     currWasmType: WasmFuncType,
@@ -20,7 +20,6 @@ function MuiEnterParams(props:{
         const tempData = props.params.map(param => param);
         tempData[index] = val;
         props.setParams(tempData);
-        console.log(tempData)
     }
 
     return (
