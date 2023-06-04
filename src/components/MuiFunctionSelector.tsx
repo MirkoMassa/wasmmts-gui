@@ -37,7 +37,7 @@ function MuiFunctionSelector (props:{
       // setting number of params
    useEffect(() => {
     if(props.importedName !== '' || props.filename !== ''){
-        setOpenFunctions(!openFunctions);
+        setOpenFunctions(true);
     }
     if(wasmExports !== undefined){
         for (let i = 0; i < wasmExports.length; i++) {
