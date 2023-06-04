@@ -13,7 +13,7 @@ function Codeview(props: {
 
     function collapseContainer(){
             if(props.watText !== ''){
-                props.setWatOpen(!props.watOpen)
+                props.setWatOpen(true)
             }
             
       }
