@@ -7,15 +7,15 @@ function Codeview(props: {
     watText:string,
     watOpen:boolean,
     setWatOpen: (b:boolean)=>void,
-    filename:string
+    filename:string,
+    isImportedOrDb: boolean
     }) {
     const watTextAsArray = props.watText.split('\n');
 
     function collapseContainer(){
-            if(props.watText !== ''){
-                props.setWatOpen(true)
+            if(props.watText !== '' && props.isImportedOrDb === false){
+                props.setWatOpen(!props.watOpen)
             }
-            
       }
   return (
     <Container sx={{
