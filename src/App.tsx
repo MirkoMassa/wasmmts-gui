@@ -40,6 +40,8 @@ function App() {
   const [val, setVal] = useState(-1);
 
   async function updateWasmExample(filename:string){
+    setIsImportedOrDb(false);
+    console.log('porcamiseria')
     setwasmStates([]);
     setWasmStores({} as execTypes.storeProducePatches);
     setwasmPatches([] as patchesDescriptor[]);
@@ -51,6 +53,7 @@ function App() {
   }
 
   async function updateWasmImport(filename:string){
+    setIsImportedOrDb(true);
     setwasmStates([]);
     setWasmStores({} as execTypes.storeProducePatches);
     setwasmPatches([] as patchesDescriptor[]);
@@ -60,6 +63,7 @@ function App() {
     setWasmModule(instSource.module);
   }
   async function updateWasmStoredfile(filename:string, buffer:ArrayBuffer){
+    setIsImportedOrDb(true);
     setwasmStates([]);
     setWasmStores({} as execTypes.storeProducePatches);
     setwasmPatches([] as patchesDescriptor[]);
@@ -81,6 +85,7 @@ function App() {
   const [execToggler, setExecToggler] = useState(true);
   const [openExamples, setOpenExamples] = useState(false);
   const [openStoredFiles, setOpenStoredFiles] = useState(false);
+  const [isImportedOrDb, setIsImportedOrDb] = useState(false);
 
   // Mems
   type threednumberarr = number[][][]
@@ -179,21 +184,23 @@ function App() {
     
     //@ts-ignore
     const inst = await WASMMTS.instantiate(new Uint8Array(buffer));
-    console.log("inst",inst)
+    // console.log("inst",inst)
     return inst;
   }
   async function instantiateStoredFile(buffer:ArrayBuffer):Promise<execTypes.WebAssemblyMtsInstantiatedSource>{
     //@ts-ignore
     const inst = await WASMMTS.instantiate(new Uint8Array(buffer));
-    console.log("inst",inst)
+    // console.log("inst",inst)
     return inst;
   }
   
 
   useEffect(() => {
-    if(importedName !== ''){
+    if(isImportedOrDb === true){
       updateWasmImport(filename);
-    }else if(filename !== ''){
+      setWatOpen(false);
+    }else if(isImportedOrDb === false && filename !== ''){
+        console.log('porco diaz')
         updateWasmExample(filename);
         setWatOpen(true);
     }else{
@@ -261,6 +268,7 @@ function App() {
           watOpen={watOpen}
           setWatOpen={setWatOpen}
           filename={filename}
+          isImportedOrDb={isImportedOrDb}
         />
         
         {/* If time travel execution is enabled */}
