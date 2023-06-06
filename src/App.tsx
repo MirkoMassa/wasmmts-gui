@@ -230,6 +230,7 @@ function App() {
           setFilename={setFilename}
           wasmInstance={wasmInstance}
           showParamsAlert={ShowParamsAlert}
+          setShowParamsAlert={setShowParamsAlert}
           execToggler={execToggler}
           setExecToggler={setExecToggler}
           importedName={importedName}
