@@ -41,7 +41,6 @@ function App() {
 
   async function updateWasmExample(filename:string){
     setIsImportedOrDb(false);
-    console.log('porcamiseria')
     setwasmStates([]);
     setWasmStores({} as execTypes.storeProducePatches);
     setwasmPatches([] as patchesDescriptor[]);
@@ -71,6 +70,15 @@ function App() {
     const instSource = await instantiateStoredFile(buffer);
     setWasmInstance(instSource.instance);
     setWasmModule(instSource.module);
+  }
+
+  async function restoreSelected(){
+    setwasmStates([]);
+    setWasmStores({} as execTypes.storeProducePatches);
+    setwasmPatches([] as patchesDescriptor[]);
+    setwatText('');
+    setWasmInstance({} as execTypes.WebAssemblyMtsInstance);
+    setWasmModule({} as execTypes.WebAssemblyMtsModule);
   }
 
   // Returns & types hooks
@@ -200,16 +208,10 @@ function App() {
       updateWasmImport(filename);
       setWatOpen(false);
     }else if(isImportedOrDb === false && filename !== ''){
-        console.log('porco diaz')
         updateWasmExample(filename);
         setWatOpen(true);
     }else{
-      setwasmStates([]);
-      setWasmStores({} as execTypes.storeProducePatches);
-      setwasmPatches([] as patchesDescriptor[]);
-      setwatText('');
-      setWasmInstance({} as execTypes.WebAssemblyMtsInstance);
-      setWasmModule({} as execTypes.WebAssemblyMtsModule);
+      restoreSelected();
     }
   }, [filename, importedBuffer, importedName])
 
