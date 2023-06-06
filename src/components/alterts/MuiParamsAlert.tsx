@@ -3,13 +3,13 @@ import React, { useState } from 'react'
 import CloseIcon from '@mui/icons-material/Close';
 
 function MuiParamsAlert (props:{
-  openError:boolean,
-  setOpenError:(b:boolean)=>void
+  showParamsAlert:boolean,
+  setShowParamsAlert:(b:boolean)=>void
 }) {
     
   return (
     <Container>
-        <Collapse in={props.openError} sx={{paddingTop:"5px"}}>
+        <Collapse in={props.showParamsAlert} sx={{paddingTop:"5px"}}>
           <Alert variant="outlined" severity="error"
             action={
               <IconButton
@@ -17,7 +17,7 @@ function MuiParamsAlert (props:{
                 color="inherit"
                 size="small"
                 onClick={() => {
-                  props.setOpenError(false);
+                  props.setShowParamsAlert(false);
                 }}
               >
                 <CloseIcon fontSize="inherit" />
