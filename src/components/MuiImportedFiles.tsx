@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import { loadAllObj } from '../database';
-import { Collapse, Container, FormControl, InputLabel, MenuItem, Select, SelectChangeEvent, Typography } from '@mui/material';
+import { Collapse, Container, FormControl, IconButton, InputLabel, MenuItem, Select, SelectChangeEvent, Typography } from '@mui/material';
+import DeleteIcon from '@mui/icons-material/Delete';
 
 function MuiImportedFiles (props:{
     openStoredFiles:boolean,
@@ -35,8 +36,8 @@ function MuiImportedFiles (props:{
     };
 
     useEffect(() => {
-      updateFileList().then(() =>{
-        console.log('keys',allKeys, allObjects)
+      updateFileList().then(() => {
+        // console.log('keys',allKeys, allObjects)
       })
       
     }, [props.filename])
@@ -56,8 +57,18 @@ function MuiImportedFiles (props:{
         {allKeys.map((key, i) =>
             <MenuItem value={key}>
                 { `${key}.wasm` }
-            </MenuItem>)
-        }
+
+                <IconButton
+                    color='error'
+                    component='span'
+                >
+                    <DeleteIcon/>
+                </IconButton>
+                
+            </MenuItem>
+            
+            
+        )}
         </Select>
         </FormControl>
     </Collapse>
