@@ -27,7 +27,7 @@ function App() {
   const [wasmPatches, setwasmPatches] = useState([] as patchesDescriptor[]);
   const [val, setVal] = useState(0);
 
-  async function updateWasm(filename:string){
+  async function updateWasmExample(filename:string){
     setwasmStates([]);
     setWasmStores({} as execTypes.storeProducePatches);
     setwasmPatches([] as patchesDescriptor[]);
@@ -80,8 +80,8 @@ function App() {
     <div className="App">
       <Topbar/>
       <div className='WasmMTS_demo'>
-        <FileSelector onChange={updateWasm} selected={filename}/>
-        <FileSelectorDesktop onChange={updateWasm} selected={filename}/>
+        <FileSelector onChange={updateWasmExample} selected={filename}/>
+        <FileSelectorDesktop onChange={updateWasmExample} selected={filename}/>
         <FunctionSelector setFunc = {setFuncname} 
         wasmInstance = {wasmInstance} selected= {funcname}/>
         <FunctionSelectorDesktop setFunc = {setFuncname} 
