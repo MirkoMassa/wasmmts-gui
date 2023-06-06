@@ -3,13 +3,14 @@ import { useEffect, useState } from 'react'
 import UploadFileIcon from '@mui/icons-material/UploadFile';
 import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
 import KeyboardReturnIcon from '@mui/icons-material/KeyboardReturn';
-import CloseIcon from '@mui/icons-material/Close';
 import { WebAssemblyMtsInstance } from 'wasmmts-a_wasm_interpreter/build/src/exec/types';
 import MuiParamsAlert from './alterts/MuiParamsAlert';
 import FolderOpenIcon from '@mui/icons-material/FolderOpen';
 import MuiExamples from './MuiExamples';
 import { dbReqRes } from '../database';
 import MuiImportedFiles from './MuiImportedFiles';
+import MuiImportAlert from './alterts/MuiImportAlert';
+import MuiFunctionAlert from './alterts/MuiFunctionAlert';
 function ActionButtons (props:{
       run:(paramsCount:number) => void,
       funcName:string,
@@ -19,6 +20,7 @@ function ActionButtons (props:{
 
       wasmInstance:WebAssemblyMtsInstance,
       showParamsAlert: boolean,
+      setShowParamsAlert: (b:boolean) => void,
       
       execToggler: boolean,
       setExecToggler: (b:boolean) => void,
@@ -45,14 +47,15 @@ function ActionButtons (props:{
   
   
   const [openError, setOpenError] = useState(false);
+  const [importError, setImportError] = useState(false);
+  const [openImportError, setOpenImportError] = useState(false);
+
 
   async function handleImport(file:File){
     if(file && file.type === 'application/wasm'){
-      // storing wasm in the db
-      dbReqRes(file);
       // clearing everything
       handleClear();
-      props.setImportedName(file.name);
+      
 
       const reader = new FileReader();
       reader.readAsArrayBuffer(file);
@@ -61,7 +64,21 @@ function ActionButtons (props:{
       }
       reader.onload = () => {
         const importedBuffer:ArrayBuffer = reader.result as ArrayBuffer;
+        
+        // Preamble check
+        //WASM_BINARY_MAGIC && WASM_BINARY_VERSION
+        const preamble = [0x00, 0x61, 0x73, 0x6d, 0x01, 0x00, 0x00, 0x00]
+        const uint8import = new Uint8Array(importedBuffer);
         console.log("buffer", importedBuffer);
+        for (let i = 0; i < 8; i++) {
+          if(preamble[i] !== uint8import[i]){
+            setOpenImportError(true);
+            return;
+          }
+        }
+        // storing wasm in the db
+        dbReqRes(file);
+        props.setImportedName(file.name);
         props.setImportedBuffer(importedBuffer);
       }
     }
@@ -70,9 +87,6 @@ function ActionButtons (props:{
   function executeRunButton(){
     if(props.funcName !== ''){
       props.run(paramsCount);
-      if(props.showParamsAlert === true){
-        setOpenError(true);
-      }
     }else{
         setOpenWarning(true);
     }
@@ -184,11 +198,6 @@ function ActionButtons (props:{
         
         
     </Container>
-
-    {props.showParamsAlert ? 
-    <MuiParamsAlert openError={openError} setOpenError={setOpenError}/> 
-    : null}
-
     {/* Examples collapse */}
     <MuiExamples 
       openExamples={props.openExamples} 
@@ -206,28 +215,19 @@ function ActionButtons (props:{
       updateWasmStoredfile={props.updateWasmStoredfile}
     />
 
-    <Container>
-      <Collapse in={openWarning} sx={{paddingTop:"5px"}}>
-        <Alert variant="outlined" severity="warning"
-          action={
-            <IconButton
-              aria-label="close"
-              color="inherit"
-              size="small"
-              onClick={() => {
-                setOpenWarning(false);
-              }}
-            >
-              <CloseIcon fontSize="inherit" />
-            </IconButton>
-          }
-          sx={{ mb: 2 }}
-        >
-          You need to select a function!
-        </Alert>
-      </Collapse>
-    </Container>
-    
+    <MuiFunctionAlert 
+      openWarning={openWarning} 
+      setOpenWarning={setOpenWarning}
+    />
+    <MuiImportAlert 
+      openImportError={openImportError} 
+      setOpenImportError={setOpenImportError}
+    />
+    <MuiParamsAlert 
+      showParamsAlert={props.showParamsAlert} 
+      setShowParamsAlert={props.setShowParamsAlert}
+    />
+
   </Container>
   )
 }
