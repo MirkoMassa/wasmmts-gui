@@ -44,7 +44,7 @@ export function storeObj(db:IDBDatabase,
 
     request.onerror = (e) => {
         // @ts-ignore
-        console.error('Error while storing blob.', e.target.result);
+        console.error('Error while storing blob.', e.target.error);
     };
     request.onsuccess = (e) => {
         // @ts-ignore
@@ -54,6 +54,31 @@ export function storeObj(db:IDBDatabase,
     transaction.oncomplete = () => {
         console.log('Storing transaction completed.');
         db.close();
+    }
+};
+export async function removeObj(key:string):Promise<void> {
+    try {
+        const [dbRequest, db] = await dbAccess()!;
+        const transaction = db.transaction(['files'], 'readwrite');
+        const objStore = transaction.objectStore('files');
+        const request = objStore.delete(key);
+    request.onerror = (e) => {
+        // @ts-ignore
+        console.error('Error while removing blob.', e.target.error);
+    };
+    request.onsuccess = (e) => {
+        // @ts-ignore
+        console.log('Blob removed', key);
+    };
+
+    transaction.oncomplete = () => {
+        console.log('Remove transaction completed.');
+        db.close();
+    }
+
+    } catch (err) {
+        console.error('Error:', err);
+        throw err;
     }
 };
 
@@ -127,33 +152,6 @@ export async function loadAllObj(): Promise<[string[], Blob[]]> {
     } catch (err) {
         console.error('Error:', err);
         throw err;
-    }
-}
-
-
-//@TODO
-export function removeObj(db:IDBDatabase, 
-    objStore:IDBObjectStore,
-    transaction:IDBTransaction,
-    key:string) {
-        
-    const request = objStore.get(key);
-    request.onerror = (e) => {
-        // @ts-ignore
-        console.error('Error while retrieving blob.', e.target.result);
-    }
-    request.onsuccess = (e) => {
-        // @ts-ignore
-        const resBlob:Blob = e.target.result;
-        if(resBlob){
-            console.log(resBlob);
-        } else {
-            console.log('File not found.');
-        }
-        transaction.oncomplete = function() {
-            console.log("Loading transaction completed");
-            db.close();
-        };
     }
 }
 
