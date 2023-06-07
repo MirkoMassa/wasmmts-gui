@@ -1,7 +1,8 @@
-import React, { useEffect, useState } from 'react'
-import { loadAllObj } from '../database';
+import React, { useEffect, useRef, useState } from 'react'
+import { loadAllObj, removeObj } from '../database';
 import { Collapse, Container, FormControl, IconButton, InputLabel, MenuItem, Select, SelectChangeEvent, Typography } from '@mui/material';
 import DeleteIcon from '@mui/icons-material/Delete';
+import { Padding } from '@mui/icons-material';
 
 function MuiImportedFiles (props:{
     openStoredFiles:boolean,
@@ -13,8 +14,13 @@ function MuiImportedFiles (props:{
 
 }) {
     
+    // mutable ref obj for the select component
+    const selectRef = useRef(null);
+
     const [allObjects, setAllObjects] = useState([] as Blob[])
     const [allKeys, setAllKeys] = useState([] as string[])
+    const [stayOpen, setStayOpen] = useState(false);
+
     async function updateFileList() {
         const [resAllKeys, resAllObj] = await loadAllObj();
         for (let i = 0; i < resAllKeys.length; i++) {
@@ -22,52 +28,83 @@ function MuiImportedFiles (props:{
         }
         setAllKeys(resAllKeys);
         setAllObjects(resAllObj);
-
     }
+
+    const [selectedValue, setSelectedValue] = useState(props.filename);
+    const renderValue = (selectedValue:string) => (
+        <Container>
+          {selectedValue}.wasm
+        </Container>
+    );
     
     const handleChange = async (event: SelectChangeEvent) => {
-
+        setStayOpen(false);
         const selectedKey = event.target.value as string;
         const index = allKeys.indexOf(selectedKey);
         const file = await allObjects[index].arrayBuffer();
-        console.log(file);
+        setSelectedValue(selectedKey);
         props.updateWasmStoredfile(selectedKey, file);
     
     };
+    async function handleFileDelete(key:string) {
+        setStayOpen(true);
+        await removeObj(key+'.wasm').then( () =>{
+            setStayOpen(false);
+            props.setFilename('')
+            props.setImportedName('')
+        })
+        
+    }
 
     useEffect(() => {
       updateFileList().then(() => {
         // console.log('keys',allKeys, allObjects)
       })
       
-    }, [props.filename])
+    }, [props.filename, stayOpen])
     
+    const handleOpen = () => {
+        setStayOpen(true);
+    };
+    const handleClose = () => {
+        setStayOpen(false);
+    };
 
   return (
     <Collapse in={props.openStoredFiles}>
         <FormControl fullWidth>
         <InputLabel id="SelectorLabel">Stored files</InputLabel>
         <Select
+            ref={selectRef}
+            open={stayOpen}
+            onOpen={handleOpen}
+            onClose={handleClose}
             labelId="Example selector"
             id="Selector"
             value={props.filename}
             label="Function"
             onChange={handleChange}
+            renderValue={renderValue}
+
         >
         {allKeys.map((key, i) =>
-            <MenuItem value={key}>
-                { `${key}.wasm` }
-
-                <IconButton
+            <MenuItem value={key} sx={{ display:'flex', alignItems:'left'}}>
+                <Container 
+                sx= {{zIndex:1}} >
+                    { `${key}.wasm` }
+                </Container>
+                <IconButton 
+                    onClick={(e) => {
+                        e.stopPropagation(); // Prevent event bubbling
+                        handleFileDelete(key)}}
+                    sx={{ 
+                        alignSelf:'flex-end',
+                        zIndex:2
+                    }}
                     color='error'
                     component='span'
-                >
-                    <DeleteIcon/>
-                </IconButton>
-                
+                ><DeleteIcon sx={{zIndex:2}}/></IconButton>
             </MenuItem>
-            
-            
         )}
         </Select>
         </FormControl>
