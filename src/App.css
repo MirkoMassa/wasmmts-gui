@@ -55,3 +55,8 @@ img {
 .StoredFilenameDiv {
     align-self: flex-start;
 }
+
+.ImportButtons {
+    display: flex;
+    justify-content: space-between;
+}
