@@ -11,7 +11,14 @@ import { dbReqRes } from '../database';
 import MuiImportedFiles from './MuiImportedFiles';
 import MuiImportAlert from './alterts/MuiImportAlert';
 import MuiFunctionAlert from './alterts/MuiFunctionAlert';
-function ActionButtons (props:{
+import MuiImportButtons from './MuiImportButtons';
+
+import axios from 'axios';
+import path from 'path';
+const api_url = process.env.REACT_APP_API_URL;
+
+function ActionButtons (
+  props:{
       run:(paramsCount:number) => void,
       funcName:string,
 
@@ -21,7 +28,7 @@ function ActionButtons (props:{
       wasmInstance:WebAssemblyMtsInstance,
       showParamsAlert: boolean,
       setShowParamsAlert: (b:boolean) => void,
-      
+
       execToggler: boolean,
       setExecToggler: (b:boolean) => void,
 
@@ -40,22 +47,85 @@ function ActionButtons (props:{
       updateWasmStoredfile: (filename:string, buffer:ArrayBuffer) => void
   }){
   const matches = useMediaQuery('(min-width:800px)');
-  
+
   const [openWarning, setOpenWarning] = useState(false);
   const [funcsCount, setFuncsCount] = useState(0);
   const [paramsCount, setParamsCount] = useState(0);
-  
-  
+
   const [openError, setOpenError] = useState(false);
   const [importError, setImportError] = useState(false);
   const [openImportError, setOpenImportError] = useState(false);
 
+  // used to execute console commands like asc compiling
+  const executeCompileRequest = async (fileName: string) => {
+    try {
+      // passing the command in post req.body
+      const response = await axios.post(`${api_url}/tscompile`, { fileName });
+      console.log('res:',response.data.message);
+    } catch (error) {
+      // @ts-ignore
+      console.error('Error executing command:', error.message);
+    }
+  };
 
-  async function handleImport(file:File){
+  async function handleTsImport(file:File){
+    console.log('type',file.type)
+    const fileName = file.name;
+    const filenameNoExt = fileName.slice(0, fileName.length-3);
+    // idk why .ts is recognized as text/vnd.trolltech.linguist
+    // so that's the check
+    if(file && file.type === 'text/vnd.trolltech.linguist'){
+      handleClear();
+      dbReqRes(file);
+      // storing temp .ts file in the server
+      try {
+      const formData = new FormData();
+      formData.append('file', file); // Append the file to the FormData object
+      // console.log('passed formdata',formData)
+      const tempResponse = await axios.post(`${api_url}/uploadTemp`, formData);
+      console.log(tempResponse);
+      // compiling
+      const compileResponse = await executeCompileRequest(fileName).then(() => {
+        // retrieve wat and wasm from temp folder
+        fetch(`/compiledFiles/${filenameNoExt}.wasm`)
+          .then(res => res.blob())
+          .then(blob => {
+            const filename = `${filenameNoExt}.wasm`;
+            const wasmFile = new File([blob], filename);
+            console.log('obtained wasm', wasmFile);
+            dbReqRes(wasmFile);
+          })
+        .catch(error => console.error(error));
+        fetch(`/compiledFiles/${filenameNoExt}.wat`)
+          .then(res => res.blob())
+          .then(blob => {
+            const filename = `${filenameNoExt}.wat`;
+            const watFile = new File([blob], filename);
+            console.log('obtained wat', watFile);
+            dbReqRes(watFile);
+            
+          })
+        .catch(error => console.error(error));
+      });
+
+      } catch (error) {
+        // @ts-ignore
+        console.error('Error storing temp file:', error.message);
+      }
+
+      // @TODO
+      // keep the node server running in background with pm2
+      // post the file to the server
+      // upload the obtained files in the db
+      // rename the files to have the same filename as this
+      // exclude different extension than wasm on the Stored Files selector
+    }
+  }
+
+  async function handleWasmImport(file:File){
     if(file && file.type === 'application/wasm'){
       // clearing everything
       handleClear();
-      
 
       const reader = new FileReader();
       reader.readAsArrayBuffer(file);
@@ -64,7 +134,7 @@ function ActionButtons (props:{
       }
       reader.onload = () => {
         const importedBuffer:ArrayBuffer = reader.result as ArrayBuffer;
-        
+
         // Preamble check
         //WASM_BINARY_MAGIC && WASM_BINARY_VERSION
         const preamble = [0x00, 0x61, 0x73, 0x6d, 0x01, 0x00, 0x00, 0x00]
@@ -98,7 +168,7 @@ function ActionButtons (props:{
     }
     props.setOpenStoredFiles(!props.openStoredFiles)
   }
-  
+
   function handleClear(){
     props.setFilename('');
     props.setImportedName('');
@@ -110,14 +180,14 @@ function ActionButtons (props:{
   }
 
   useEffect(() => {
-    const count = props.wasmInstance.exportsTT !== undefined 
+    const count = props.wasmInstance.exportsTT !== undefined
     && Object.keys(props.wasmInstance.exportsTT).length;
     setFuncsCount(count as number);
-    
+
     return () => {
     }
   }, [props.wasmInstance])
-  
+
   return (
   <Container sx={{
     paddingY:'16px', paddingBottom:'0px'}}>
@@ -127,8 +197,8 @@ function ActionButtons (props:{
     }}>
       <Typography variant='h6' align='center'>
         Selected:{' '}
-        {props.importedName !== '' ? 
-        props.importedName : 
+        {props.importedName !== '' ?
+        props.importedName :
         props.filename+'.wasm'}
       </Typography>
     </Container>}
@@ -140,27 +210,12 @@ function ActionButtons (props:{
       paddingX:'0px',
       justifyContent:'space-between'
     }}>
-        {/* IMPORT BTN */}
-        <label htmlFor='binary'>
-          <input
-            id='binary'
-            type='file'
-            accept="application/wasm"
-            multiple
-            style={{ position: 'fixed', top: '-100em' }}
-            onChange={(event) =>handleImport(event.target.files![0])}
-          />
-          <Tooltip title='Upload Files'>
-            <IconButton size={matches?'large':'small'}
-            color='primary'
-            component='span'
-            >
-              Import<UploadFileIcon/>
-            </IconButton>
-          </Tooltip>
-        
-        </label>
-
+        {/* IMPORT ts & wasm*/}
+        <MuiImportButtons
+          matches={matches}
+          handleWasmImport={handleWasmImport}
+          handleTsImport={handleTsImport}
+        />
         {/* STORED FILES BTN */}
         <IconButton size={matches?'large':'small'} onClick={handleFiles}
           sx={{
@@ -195,13 +250,13 @@ function ActionButtons (props:{
           label="Toggle Time Travel execution"
           labelPlacement="bottom"
         />
-        
-        
+
+
     </Container>
     {/* Examples collapse */}
-    <MuiExamples 
-      openExamples={props.openExamples} 
-      filename={props.filename} 
+    <MuiExamples
+      openExamples={props.openExamples}
+      filename={props.filename}
       setFilename={props.setFilename}
       setImportedName={props.setImportedName}
     />
@@ -215,16 +270,16 @@ function ActionButtons (props:{
       updateWasmStoredfile={props.updateWasmStoredfile}
     />
 
-    <MuiFunctionAlert 
-      openWarning={openWarning} 
+    <MuiFunctionAlert
+      openWarning={openWarning}
       setOpenWarning={setOpenWarning}
     />
-    <MuiImportAlert 
-      openImportError={openImportError} 
+    <MuiImportAlert
+      openImportError={openImportError}
       setOpenImportError={setOpenImportError}
     />
-    <MuiParamsAlert 
-      showParamsAlert={props.showParamsAlert} 
+    <MuiParamsAlert
+      showParamsAlert={props.showParamsAlert}
       setShowParamsAlert={props.setShowParamsAlert}
     />
 
