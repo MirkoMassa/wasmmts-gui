@@ -114,7 +114,6 @@ function ActionButtons (
       }
 
       // @TODO
-      // keep the node server running in background with pm2
       // post the file to the server
       // upload the obtained files in the db
       // rename the files to have the same filename as this
