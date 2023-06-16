@@ -23,7 +23,11 @@ app.post('/webhook', (req, res) => {
 
   const buildDirectory = '/var/mirkomassa.com-code/wassmts-gui';
   // const targetDirectory = '/var/www/mirkomassa.com';
-  childProcess.exec('./webhook.sh', (error, stdout, stderr) => {
+  const options = {
+    cwd: buildDirectory
+  };
+  childProcess.exec('./webhook.sh', 
+    options, (error, stdout, stderr) => {
     if (error) {
       console.error(`Error during script execution: ${error.message}`);
       res.sendStatus(500);
@@ -48,6 +52,7 @@ app.post('/webhook', (req, res) => {
     }
     console.log('pid:',stdout);
   });
+
 });
 
 // uploading temporary .ts file, compiled to wat and wasm and
