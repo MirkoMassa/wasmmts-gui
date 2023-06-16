@@ -1,7 +1,9 @@
 const express = require('express');
 const path = require('path');
+const fs = require('fs');
 const fileUpload = require('express-fileupload');
 const childProcess = require('child_process');
+const { exec, spawn } = require('child_process');
 const cors = require('cors');
 
 const port = 3001;
@@ -19,17 +21,85 @@ app.get('/', (req, res) => {
 // update react static files
 app.post('/webhook', (req, res) => {
 
-  childProcess.exec('npm run build', (error, stdout, stderr) => {
-    if (error) {
-      console.error(`Error: ${error.message}`);
+  // WHAT TO DO!
+  // pull the files from repo, run build, swap files with
+  // new ones inside /var/www/mirkomassa.com
+  const buildDirectory = '/var/mirkomassa.com-code/wassmts-gui';
+  // const targetDirectory = '/var/www/mirkomassa.com';
+  const options = {
+    cwd: buildDirectory
+  };
+  // Pull the latest changes from the repository
+  childProcess.exec('./webhook.sh',
+   options, (pullError, pullStdout, pullStderr) => {
+    if (pullError) {
+      console.error(`Error during Git pull: ${pullError.message}`);
+      res.sendStatus(500);
       return;
     }
-    if (stderr) {
-      console.error(`Stderr: ${stderr}`);
+    if (pullStderr) {
+      console.error(`Git pull error: ${pullStderr}`);
+      res.sendStatus(500);
       return;
     }
-    console.log(`Build successful. Output: ${stdout}`);
   });
+  // npm install just in case
+  // childProcess.exec('npm install', options, (error, stdout, stderr) => {
+  //   if (error) {
+  //     console.error(`Error during npm install: ${error.message}`);
+  //     res.sendStatus(500);
+  //     return;
+  //   }
+  //   if (stderr) {
+  //     console.error(`Npm install stderror: ${stderr}`);
+  //     res.sendStatus(500);
+  //     return;
+  //   }
+  //   // npm run build of static react files
+  //   const buildProcess = spawn('npm', ['run', 'build'], options);
+    
+  //   buildProcess.stdout.on('data', (data) => {
+  //     console.log(`Build output: ${data}`);
+  //   });
+
+  //   buildProcess.stderr.on('data', (data) => {
+  //     console.error(`Build error: ${data}`);
+  //   });
+
+  //   buildProcess.on('error', (error) => {
+  //     console.error(`Error during build: ${error.message}`);
+  //     res.sendStatus(500);
+  //   });
+
+  //   buildProcess.on('close', (code) => {
+  //     if (code === 0) {
+  //       console.log('Build successful.');
+
+  //       // Swap the new build files with the existing ones
+  //       try {
+  //         fs.readdirSync(targetDirectory).forEach((file) => {
+  //           const filePath = path.join(targetDirectory, file);
+  //           fs.unlinkSync(filePath);
+  //         });
+
+  //         fs.readdirSync(buildDirectory).forEach((file) => {
+  //           const sourcePath = path.join(buildDirectory, file);
+  //           const targetPath = path.join(targetDirectory, file);
+  //           fs.copyFileSync(sourcePath, targetPath);
+  //         });
+
+  //         console.log('File swap successful.');
+  //         res.sendStatus(200);
+  //       } catch (error) {
+  //         console.error(`Error during file swap: ${error.message}`);
+  //         res.sendStatus(500);
+  //       }
+  //     } else {
+  //       console.error(`Build process exited with code ${code}`);
+  //       res.sendStatus(500);
+  //     }
+  //   });
+  // });
 });
 
 // uploading temporary .ts file, compiled to wat and wasm and
