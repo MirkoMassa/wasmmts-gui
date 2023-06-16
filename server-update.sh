@@ -1,0 +1,1 @@
+mv * /var/servers/mirkomassa-api/;
