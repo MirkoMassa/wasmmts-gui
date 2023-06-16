@@ -18,7 +18,7 @@ app.get('/', (req, res) => {
   res.send(`hello: ${new Date()}.`);
 })
 
-// update react static files
+// update react static files & server
 app.post('/webhook', (req, res) => {
 
   const buildDirectory = '/var/mirkomassa.com-code/wassmts-gui';
@@ -26,9 +26,7 @@ app.post('/webhook', (req, res) => {
   const options = {
     cwd: buildDirectory
   };
-  // Pull the latest changes from the repository
-  childProcess.exec('./server/webhook.sh',
-   options, (error, stdout, stderr) => {
+  childProcess.exec('./webhook.sh', (error, stdout, stderr) => {
     if (error) {
       console.error(`Error during script execution: ${error.message}`);
       res.sendStatus(500);
@@ -40,6 +38,20 @@ app.post('/webhook', (req, res) => {
       return;
     }
   });
+  childProcess.exec('ps aux | grep node', (error, stdout, stderr) => {
+    if (error) {
+      console.error(`Error during ps execution: ${error.message}`);
+      res.sendStatus(500);
+      return;
+    }
+    if (stderr) {
+      console.error(`Ps stderror: ${stderr}`);
+      res.sendStatus(500);
+      return;
+    }
+    console.log('pid:',stdout);
+  });
+
 });
 
 // uploading temporary .ts file, compiled to wat and wasm and
