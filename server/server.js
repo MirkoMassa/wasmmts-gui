@@ -20,13 +20,13 @@ app.get('/', (req, res) => {
 
 // update react static files & server
 app.post('/webhook', (req, res) => {
-
-  const buildDirectory = '/var/mirkomassa.com-code/wassmts-gui';
+  const buildDirectory = '/var/wasmmts-gui';
   // const targetDirectory = '/var/www/mirkomassa.com';
+  console.log ('currend dir',process.cwd());
   const options = {
     cwd: buildDirectory
   };
-  childProcess.exec('./webhook.sh', 
+  childProcess.exec('/var/wasmmts-gui/webhook.sh',
     options, (error, stdout, stderr) => {
     if (error) {
       console.error(`Error during script execution: ${error.message}`);
@@ -38,7 +38,9 @@ app.post('/webhook', (req, res) => {
       res.sendStatus(500);
       return;
     }
+    res.sendStatus(200);
   });
+  // update and restart api (WIP)
   childProcess.exec('ps aux | grep node', (error, stdout, stderr) => {
     if (error) {
       console.error(`Error during ps execution: ${error.message}`);
