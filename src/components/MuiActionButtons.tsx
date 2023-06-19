@@ -3,7 +3,7 @@ import { useEffect, useState } from 'react'
 import UploadFileIcon from '@mui/icons-material/UploadFile';
 import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
 import KeyboardReturnIcon from '@mui/icons-material/KeyboardReturn';
-import { WebAssemblyMtsInstance } from 'wasmmts-a_wasm_interpreter/build/src/exec/types';
+import { WebAssemblyMtsInstance } from 'wasmmts/build/src/exec/types';
 import MuiParamsAlert from './alterts/MuiParamsAlert';
 import FolderOpenIcon from '@mui/icons-material/FolderOpen';
 import MuiExamples from './MuiExamples';
@@ -14,7 +14,6 @@ import MuiFunctionAlert from './alterts/MuiFunctionAlert';
 import MuiImportButtons from './MuiImportButtons';
 
 import axios from 'axios';
-import path from 'path';
 const api_url = process.env.REACT_APP_API_URL;
 
 function ActionButtons (
@@ -86,21 +85,25 @@ function ActionButtons (
       console.log(tempResponse);
       // compiling
       const compileResponse = await executeCompileRequest(fileName).then(() => {
-        // retrieve wat and wasm from temp folder
-        fetch(`/compiledFiles/${filenameNoExt}.wasm`)
+        // retrieve wasm
+        let fetchFilename = `${filenameNoExt}.wasm`;
+        fetch(`${api_url}/compiledFiles?fileName=${fetchFilename}`, 
+        { method: 'GET' })
           .then(res => res.blob())
           .then(blob => {
-            const filename = `${filenameNoExt}.wasm`;
-            const wasmFile = new File([blob], filename);
+            console.log('wasm blob', blob);
+            const wasmFile = new File([blob], fetchFilename);
             console.log('obtained wasm', wasmFile);
             dbReqRes(wasmFile);
           })
         .catch(error => console.error(error));
-        fetch(`/compiledFiles/${filenameNoExt}.wat`)
+        // retrieve wat
+        fetchFilename = `${filenameNoExt}.wat`;
+        fetch(`${api_url}/compiledFiles?fileName=${fetchFilename}`, 
+        { method: 'GET' })
           .then(res => res.blob())
           .then(blob => {
-            const filename = `${filenameNoExt}.wat`;
-            const watFile = new File([blob], filename);
+            const watFile = new File([blob], fetchFilename);
             console.log('obtained wat', watFile);
             dbReqRes(watFile);
             
