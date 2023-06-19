@@ -1,8 +1,8 @@
 import {buildStateStrings, patchesDescriptor, stateDescriptor, buildPatchesStrings, 
-    buildMemStatesStrings, memDescriptors, buildMemStatesArrays } from 'wasmmts-a_wasm_interpreter/build/src/debugging/stringifier'
-import WASMMTS, { WasmFuncType } from 'wasmmts-a_wasm_interpreter/build/src/exec/wasmm'
-import * as execTypes from 'wasmmts-a_wasm_interpreter/build/src/exec/types'
-import { custom } from 'wasmmts-a_wasm_interpreter/build/src/types';
+    buildMemStatesStrings, memDescriptors, buildMemStatesArrays } from 'wasmmts/build/src/debugging/stringifier'
+import WASMMTS, { WasmFuncType } from 'wasmmts/build/src/exec/wasmm'
+import * as execTypes from 'wasmmts/build/src/exec/types'
+import { custom } from 'wasmmts/build/src/types';
 
 import './App.css';
 import React, { useEffect, useState } from 'react';
@@ -14,13 +14,14 @@ import MuiStackView from './components/TTexecution/MuiStackView';
 import MuiStateSlider from './components/TTexecution/MuiStateSlider';
 import MuiEnterParams from './components/MuiEnterParams';
 import { Alert, Collapse, Container, IconButton } from '@mui/material';
-import MuiParamsAltert from './components/alterts/MuiParamsAlert';
-import MuiParamsAlert from './components/alterts/MuiParamsAlert';
+import MuiParamsAltert from './components/alerts/MuiParamsAlert';
+import MuiParamsAlert from './components/alerts/MuiParamsAlert';
 import MuiInstructions from './components/MuiInstructions';
 import MuiPatchesView from './components/TTexecution/MuiPatchesView';
 import MuiMemView from './components/TTexecution/MuiMemView';
 import TTexecutionWrapper from './components/TTexecutionWrapper';
 import ExecutionWrapper from './components/ExecutionWrapper';
+import { dbReqRes } from './database';
 
 
 function App() {
@@ -67,6 +68,14 @@ function App() {
     setWasmStores({} as execTypes.storeProducePatches);
     setwasmPatches([] as patchesDescriptor[]);
     setFilename(filename);
+
+    // retrieving wat text
+    const dbRes = await dbReqRes(`${filename}.wat`);
+    if(dbRes !== null){
+      console.log(dbRes)
+    }
+    
+
     const instSource = await instantiateStoredFile(buffer);
     setWasmInstance(instSource.instance);
     setWasmModule(instSource.module);
@@ -291,7 +300,7 @@ function App() {
   );
 }
 
-// Getter functions
+// Getter functions for /EXAMPLES/
 async function getWasm(path:string):Promise<ArrayBuffer>{
   const res:Response = await fetch(`./examples/${path}`);
   const wasmBuffer = await res.arrayBuffer();
