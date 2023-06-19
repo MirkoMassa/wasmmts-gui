@@ -83,38 +83,28 @@ app.post('/tscompile', (req, res) => {
   const filePath = `tempFiles/${fileName}`;
   const command = 
   `asc ${filePath} -o tempFiles/${fileNameNoExt}.wasm -t tempFiles/${fileNameNoExt}.wat`;
-
   console.log('extension', fileNameNoExt, ',path', filePath, ',command', command);
 
-  const child = childProcess.spawn(command, { shell: true });
-
   console.log('compiling', fileName);
-
-  child.stdout.on('data', (data) => {
-    console.log('data',data.toString());
-    res.send(data.toString());
-  });
-
-  child.stderr.on('data', (data) => {
-    console.log('error')
-    console.error(data.toString());
-  });
-
-  child.on('exit', (code) => {
-    if (code === 0) {
-      res.status(200).json({ message: 'Command executed successfully.' });
-    } else {
+  const child = childProcess.exec(command, (error, stdout, stderr) => {
+    if (error) {
+      console.error(`Error during asc execution: ${error.message}`);
       res.status(500).json({ message: 'Command execution failed.' });
+      return;
     }
+    if (stderr) {
+      console.error(`asc stderror: ${stderr}`);
+      res.status(500).json({ message: 'Command execution failed.' });
+      return;
+    }
+    res.status(200).json({ message: 'Command executed successfully.' });
   });
-
 });
 
 app.get('/compiledFiles', (req, res) => {
-  let {fileName} = req.body;
-  fileName = fileName.slice(0, fileName.length-3);
+  const { fileName } = req.query;
   console.log('getting', fileName);
-  const filePath = path.join(__dirname, 'tempFiles', `${fileName}.pdf`);
+  const filePath = path.join(__dirname, 'tempFiles', fileName);
   res.sendFile(filePath);
 });
 
