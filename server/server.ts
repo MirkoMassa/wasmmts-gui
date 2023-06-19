@@ -1,10 +1,18 @@
-const express = require('express');
-const path = require('path');
-const fs = require('fs');
-const fileUpload = require('express-fileupload');
-const childProcess = require('child_process');
-const { exec, spawn } = require('child_process');
-const cors = require('cors');
+// const express = require('express');
+// const fs = require('fs');
+// const fileUpload = require('express-fileupload');
+// const childProcess = require('child_process');
+
+// const path = require('path');
+
+import express from "express";
+import fileUpload from 'express-fileupload';
+import fs from 'fs';
+import childProcess from 'child_process';
+import {exec, spawn} from 'child_process';
+import {createHash} from 'node:crypto';
+import cors from 'cors';
+import {join} from 'path';
 
 const port = 3001;
 const app = express();
@@ -65,17 +73,43 @@ app.post('/uploadTemp', (req, res) => {
       return res.status(400).send('No files were uploaded.');
     }
     const file = req.files.file;
-    // console.log('file:', file);
-    // mv() method saves the file
-    file.mv('tempFiles/' + file.name, (err) => {
-      if (err) {
-        console.log(err)
-        return res.status(500).send(err);
-      }
-      // console.log('stored', file)
-      res.send('File uploaded successfully');
-    });
-  });
+    if(!Array.isArray(file)){
+
+        const hash = createHash('sha256');
+
+        hash.update(file.data);
+        console.log(hash.digest('hex'));
+
+        file.mv('tempFiles/' + file.name, (err) => {
+          if (err) {
+            console.log(err)
+            return res.status(500).send(err);
+          }
+          // console.log('stored', file)
+          res.send('File uploaded successfully');
+        });
+    }
+});
+
+
+  // app.post('/removeTemp', (req, res) => {
+  //   // checking if there are passed files
+  //   if (!req.files || Object.keys(req.files).length === 0) {
+  //     return res.status(400).send('No files were removed.');
+  //   }
+    
+  //   // console.log('file:', file);
+  //   // mv() method saves the file
+  //   file.('tempFiles/' + file.name, (err) => {
+  //     if (err) {
+  //       console.log(err)
+  //       return res.status(500).send(err);
+  //     }
+  //     // console.log('stored', file)
+  //     res.send('File uploaded successfully');
+  //   });
+  // });
+
 
 app.post('/tscompile', (req, res) => {
   const {fileName} = req.body;
@@ -101,14 +135,20 @@ app.post('/tscompile', (req, res) => {
   });
 });
 
+
 app.get('/compiledFiles', (req, res) => {
-  const { fileName } = req.query;
-  console.log('getting', fileName);
-  const filePath = path.join(__dirname, 'tempFiles', fileName);
-  res.sendFile(filePath);
+  
+  // check the hash!!
+
+  const fileName = req.query.fileName;
+  if(typeof fileName === 'string'){
+    console.log('getting', fileName);
+    const filePath = join(__dirname, 'tempFiles', fileName);
+    res.sendFile(filePath);
+  }
 });
 
-app.use(express.static(path.join(__dirname, 'tempFiles')));
+app.use(express.static(join(__dirname, 'tempFiles')));
 
 app.listen(port, () => {
   console.log(`Server is running on port ${port}`);
