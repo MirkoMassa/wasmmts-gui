@@ -1,5 +1,5 @@
 // file param handles a db store, filename param (key) handles a load 
-export async function dbReqRes(fileOrKey:File | string):Promise<Blob | void>{
+export async function dbReqRes(fileOrKey:File | string):Promise<Blob | void | null>{
     // @ts-ignore
     const indexedDB = window.indexedDB || window.mozIndexedDB || window.webkitIndexedDB || window.msIndexedDB || window.shimIndexedDB;
     const request = indexedDB.open('wasmfiles', 2);
@@ -37,7 +37,9 @@ export function storeObj(db:IDBDatabase,
     transaction:IDBTransaction,
     file:File):void {
     const key = file.name;
-    const blobToStore = new Blob([file], {type: file.type});
+    const extension = key.match(/\.(\w+)$/)?.[0];
+    console.log('ext', extension)
+    const blobToStore = new Blob([file], {type: extension});
     // console.log(blobToStore, key);
     
     const request = objStore.add(blobToStore, key);
@@ -138,7 +140,11 @@ export async function loadAllObj(): Promise<[string[], Blob[]]> {
                 console.log('loadingAll transaction completed.');
                 db.close();
                 // console.log(resKeys, resBlobs)
-                resolve([resKeys, resBlobs]);
+                const filteredKeys = resKeys.filter(key => key.endsWith('.wasm'));
+                const filteredBlobs = resBlobs.filter(blob => blob.type === '.wasm');
+
+                // const filteredBlobs
+                resolve([filteredKeys, filteredBlobs]);
             };
         };
 
