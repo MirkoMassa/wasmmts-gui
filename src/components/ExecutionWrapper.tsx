@@ -2,7 +2,7 @@ import { Container, Typography } from '@mui/material'
 import React from 'react'
 import KeyboardDoubleArrowRightIcon from '@mui/icons-material/KeyboardDoubleArrowRight';
 import KeyboardDoubleArrowLeftIcon from '@mui/icons-material/KeyboardDoubleArrowLeft';
-import { WasmFuncType } from 'wasmmts-a_wasm_interpreter/build/src/exec/wasmm';
+import { WasmFuncType } from 'wasmmts/build/src/exec/wasmm';
 
 function ExecutionWrapper (props:{
   funcReturns: (number | bigint)[],

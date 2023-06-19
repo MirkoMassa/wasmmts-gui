@@ -48,7 +48,7 @@ function MuiImportedFiles (props:{
     };
     async function handleFileDelete(key:string) {
         setStayOpen(true);
-        await removeObj(key+'.wasm').then( () =>{
+        await removeObj(key +'.wasm').then( () =>{
             setStayOpen(false);
             props.setFilename('')
             props.setImportedName('')
@@ -58,7 +58,7 @@ function MuiImportedFiles (props:{
 
     useEffect(() => {
       updateFileList().then(() => {
-        // console.log('keys',allKeys, allObjects)
+        console.log('keys',allKeys, allObjects)
       })
       
     }, [props.filename, stayOpen])

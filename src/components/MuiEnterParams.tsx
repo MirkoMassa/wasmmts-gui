@@ -1,5 +1,5 @@
 import { Box, Collapse, Container, FormControl, IconButton, Input, Typography } from '@mui/material'
-import { WasmFuncType } from 'wasmmts-a_wasm_interpreter/build/src/exec/wasmm'
+import { WasmFuncType } from 'wasmmts/build/src/exec/wasmm'
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
 import { useEffect } from 'react';

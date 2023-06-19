@@ -1,9 +1,9 @@
 import { Container, Typography } from '@mui/material'
 import LayersIcon from '@mui/icons-material/Layers';
-import * as execTypes from 'wasmmts-a_wasm_interpreter/build/src/exec/types'
-import {stateDescriptor, descCurrentLabel, descCurrentFrame, getCustoms, patchesDescriptor, memDescriptors } from 'wasmmts-a_wasm_interpreter/build/src/debugging/stringifier'
-import { WebAssemblyMtsStore } from 'wasmmts-a_wasm_interpreter/build/src/exec/wasmm';
-import { custom } from 'wasmmts-a_wasm_interpreter/build/src/types';
+import * as execTypes from 'wasmmts/build/src/exec/types'
+import {stateDescriptor, descCurrentLabel, descCurrentFrame, getCustoms, patchesDescriptor, memDescriptors } from 'wasmmts/build/src/debugging/stringifier'
+import { WebAssemblyMtsStore } from 'wasmmts/build/src/exec/wasmm';
+import { custom } from 'wasmmts/build/src/types';
 import MuiStateSlider from './MuiStateSlider';
 
 function MuiStackView(props: {

@@ -1,15 +1,15 @@
 import React, { useState } from 'react';
 import './App.css';
-import WASMMTS from 'wasmmts-a_wasm_interpreter/build/src/exec/wasmm'
-import * as execTypes from 'wasmmts-a_wasm_interpreter/build/src/exec/types'
-import {buildStateStrings, patchesDescriptor, stateDescriptor, buildPatchesStrings, buildMemStatesStrings, memDescriptors, buildMemStatesArrays } from 'wasmmts-a_wasm_interpreter/build/src/debugging/stringifier'
+import WASMMTS from 'wasmmts/build/src/exec/wasmm'
+import * as execTypes from 'wasmmts/build/src/exec/types'
+import {buildStateStrings, patchesDescriptor, stateDescriptor, buildPatchesStrings, buildMemStatesStrings, memDescriptors, buildMemStatesArrays } from 'wasmmts/build/src/debugging/stringifier'
 import Slider from './components/Slider'
 import FileSelector from './components/FileSelector'
 import FileSelectorDesktop from './components/FileSelectorDesktop'
 import FunctionSelector from './components/FunctionSelector';
 import FunctionSelectorDesktop from './components/FunctionSelectorDesktop';
 import RunButton from './components/RunButton';
-import { custom } from 'wasmmts-a_wasm_interpreter/build/src/types';
+import { custom } from 'wasmmts/build/src/types';
 import Topbar from './components/Topbar';
 import Memory from './components/Memory';
 

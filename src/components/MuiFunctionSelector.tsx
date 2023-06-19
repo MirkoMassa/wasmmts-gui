@@ -1,9 +1,9 @@
 import { Collapse, FormControl, InputLabel, MenuItem, Select, SelectChangeEvent } from '@mui/material';
 import { useEffect, useState } from 'react'
-import { WebAssemblyMtsInstance } from 'wasmmts-a_wasm_interpreter/build/src/exec/types';
-import * as execTypes from 'wasmmts-a_wasm_interpreter/build/src/exec/types'
+import { WebAssemblyMtsInstance } from 'wasmmts/build/src/exec/types';
+import * as execTypes from 'wasmmts/build/src/exec/types'
 import { Container } from '@mui/material';
-import { WasmFuncType, WasmType } from 'wasmmts-a_wasm_interpreter/build/src/exec/wasmm';
+import { WasmFuncType, WasmType } from 'wasmmts/build/src/exec/wasmm';
 import MuiEnterParams from './MuiEnterParams';
 
 function MuiFunctionSelector (props:{

@@ -3,8 +3,8 @@ import React from 'react'
 import MuiStackView from './TTexecution/MuiStackView'
 import MuiPatchesView from './TTexecution/MuiPatchesView'
 import MuiMemView from './TTexecution/MuiMemView'
-import { WebAssemblyMtsInstance } from 'wasmmts-a_wasm_interpreter/build/src/exec/types'
-import { patchesDescriptor, stateDescriptor } from 'wasmmts-a_wasm_interpreter/build/src/debugging/stringifier'
+import { WebAssemblyMtsInstance } from 'wasmmts/build/src/exec/types'
+import { patchesDescriptor, stateDescriptor } from 'wasmmts/build/src/debugging/stringifier'
 
 function TTexecutionWrapper (props:{
         val:number, 

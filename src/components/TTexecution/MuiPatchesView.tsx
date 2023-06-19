@@ -1,7 +1,7 @@
 import { Collapse, Container, IconButton, Typography } from '@mui/material'
 import React, { useState } from 'react'
 import ExtensionIcon from '@mui/icons-material/Extension';
-import { patchesDescriptor } from 'wasmmts-a_wasm_interpreter/build/src/debugging/stringifier';
+import { patchesDescriptor } from 'wasmmts/build/src/debugging/stringifier';
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
 

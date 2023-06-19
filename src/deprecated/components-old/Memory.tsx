@@ -1,4 +1,4 @@
-import { memDescriptors } from 'wasmmts-a_wasm_interpreter/build/src/debugging/stringifier';
+import { memDescriptors } from 'wasmmts/build/src/debugging/stringifier';
 import '../App.css';
 import { useEffect, useState } from 'react';
 

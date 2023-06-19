@@ -1,4 +1,4 @@
-import { WebAssemblyMtsInstance } from 'wasmmts-a_wasm_interpreter/build/src/exec/types';
+import { WebAssemblyMtsInstance } from 'wasmmts/build/src/exec/types';
 import '../App.css';
 
 function FunctionSelector(props:{setFunc:(name:string)=>void, wasmInstance:WebAssemblyMtsInstance, selected:string}) {
