@@ -37,7 +37,7 @@ export function storeObj(db:IDBDatabase,
     transaction:IDBTransaction,
     file:File):void {
     const key = file.name;
-    const blobToStore = new Blob([file], {type: 'application/wasm'});
+    const blobToStore = new Blob([file], {type: file.type});
     // console.log(blobToStore, key);
     
     const request = objStore.add(blobToStore, key);
