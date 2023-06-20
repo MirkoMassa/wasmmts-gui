@@ -5,6 +5,7 @@
   "main": "server.js",
   "scripts": {
     "start": "npx ts-node server.ts",
+    "nohupstart": "nohup npx ts-node server.ts > nohup.out &",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "",
