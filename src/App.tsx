@@ -68,18 +68,40 @@ function App() {
     setWasmStores({} as execTypes.storeProducePatches);
     setwasmPatches([] as patchesDescriptor[]);
     setFilename(filename);
+    console.log(`${filename}.wat`)
 
-    // retrieving wat text
-    const dbRes = await dbReqRes(`${filename}.wat`);
-    if(dbRes !== null){
-      console.log(dbRes)
-    }
+    await dbReqRes(`${filename}.wat`).then((res) =>{
+      if(res instanceof Blob){
+        getTextFromBlob(res).then(watCode => {
+          console.log(watCode)
+          setwatText(watCode);
+          setWatOpen(true);
+        })
+      }
+    });
     
-
-    const instSource = await instantiateStoredFile(buffer);
-    setWasmInstance(instSource.instance);
-    setWasmModule(instSource.module);
+    // const instSource = await instantiateStoredFile(buffer);
+    // setWasmInstance(instSource.instance);
+    // setWasmModule(instSource.module);
   }
+
+  function getTextFromBlob(blob: Blob): Promise<string> {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+  
+      reader.onload = () => {
+        const text = reader.result as string;
+        resolve(text);
+      };
+  
+      reader.onerror = () => {
+        reject(new Error('Error reading blob'));
+      };
+  
+      reader.readAsText(blob);
+    });
+  }
+
 
   async function restoreSelected(){
     setwasmStates([]);
