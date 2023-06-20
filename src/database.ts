@@ -1,9 +1,10 @@
 // file param handles a db store, filename param (key) handles a load 
 export async function dbReqRes(fileOrKey:File | string):Promise<Blob | void | null>{
     // @ts-ignore
+    
     const indexedDB = window.indexedDB || window.mozIndexedDB || window.webkitIndexedDB || window.msIndexedDB || window.shimIndexedDB;
     const request = indexedDB.open('wasmfiles', 2);
-
+    return new Promise((resolve, reject) => {
     request.onerror = (e) =>{
         console.error(`database request error: ${e}`);
     }
@@ -26,10 +27,12 @@ export async function dbReqRes(fileOrKey:File | string):Promise<Blob | void | nu
         if(fileOrKey instanceof File){
             storeObj(db, objStore, transaction, fileOrKey);
         } else if (typeof fileOrKey == 'string'){
-            return loadObj(db, objStore, transaction, fileOrKey);
+            const res =  loadObj(db, objStore, transaction, fileOrKey);
+            resolve(res);
         }
-        
+    
     }     
+    })
 }
 
 export function storeObj(db:IDBDatabase, 
@@ -142,7 +145,6 @@ export async function loadAllObj(): Promise<[string[], Blob[]]> {
                 // console.log(resKeys, resBlobs)
                 const filteredKeys = resKeys.filter(key => key.endsWith('.wasm'));
                 const filteredBlobs = resBlobs.filter(blob => blob.type === '.wasm');
-
                 // const filteredBlobs
                 resolve([filteredKeys, filteredBlobs]);
             };
