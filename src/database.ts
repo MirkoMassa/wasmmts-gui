@@ -26,6 +26,7 @@ export async function dbReqRes(fileOrKey:File | string):Promise<Blob | void | nu
         const objStore = transaction.objectStore('files');
         if(fileOrKey instanceof File){
             storeObj(db, objStore, transaction, fileOrKey);
+            resolve(null);
         } else if (typeof fileOrKey == 'string'){
             const res =  loadObj(db, objStore, transaction, fileOrKey);
             resolve(res);
