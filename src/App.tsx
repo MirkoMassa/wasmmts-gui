@@ -37,6 +37,8 @@ function App() {
   const [wasmInstance, setWasmInstance] = useState({} as execTypes.WebAssemblyMtsInstance);
   const [wasmModule, setWasmModule] = useState({} as execTypes.WebAssemblyMtsModule);
   const [watText, setwatText] = useState('');
+  const [tsText, settsText] = useState('');
+
   const [wasmPatches, setwasmPatches] = useState([] as patchesDescriptor[]);
   const [val, setVal] = useState(-1);
 
@@ -73,13 +75,21 @@ function App() {
     await dbReqRes(`${filename}.wat`).then((res) =>{
       if(res instanceof Blob){
         getTextFromBlob(res).then(watCode => {
-          console.log(watCode)
           setwatText(watCode);
-          setWatOpen(true);
+          setCodeOpen(true);
         })
       }
     });
-    
+    await dbReqRes(`${filename}.ts`).then((res) =>{
+      if(res instanceof Blob){
+        getTextFromBlob(res).then(tsCode => {
+          settsText(tsCode);
+          setCodeOpen(true);
+        })
+      }
+    });
+
+    // not working
     // const instSource = await instantiateStoredFile(buffer);
     // setWasmInstance(instSource.instance);
     // setWasmModule(instSource.module);
@@ -119,7 +129,7 @@ function App() {
 
   // Collapsers hooks & togglers
   const [ShowParamsAlert, setShowParamsAlert] = useState(false);
-  const [watOpen, setWatOpen] = useState(false);
+  const [watOpen, setCodeOpen] = useState(false);
   const [paramsOpen, setParamsOpen] = useState(false);
   const [execToggler, setExecToggler] = useState(true);
   const [openExamples, setOpenExamples] = useState(false);
@@ -212,8 +222,6 @@ function App() {
         setFuncReturns(resArray);
       }
     }
-
-    
   }
 
   async function instantiateModule(filename?:string):Promise<execTypes.WebAssemblyMtsInstantiatedSource>{
@@ -226,21 +234,27 @@ function App() {
     // console.log("inst",inst)
     return inst;
   }
+  
   async function instantiateStoredFile(buffer:ArrayBuffer):Promise<execTypes.WebAssemblyMtsInstantiatedSource>{
-    //@ts-ignore
-    const inst = await WASMMTS.instantiate(new Uint8Array(buffer));
-    // console.log("inst",inst)
-    return inst;
+    return new Promise((resolve, reject) => {
+      WASMMTS.instantiate(new Uint8Array(buffer)).then((inst) => {
+        console.log("inst",inst);
+        resolve(inst);
+      }).catch((error)=>{
+        console.log(`Error during instantiation: ${error}`);
+      });
+    })
+    
   }
   
 
   useEffect(() => {
     if(isImportedOrDb === true){
       updateWasmImport(filename);
-      setWatOpen(false);
+      setCodeOpen(false);
     }else if(isImportedOrDb === false && filename !== ''){
         updateWasmExample(filename);
-        setWatOpen(true);
+        setCodeOpen(true);
     }else{
       restoreSelected();
     }
@@ -268,7 +282,7 @@ function App() {
           setImportedName={setImportedName}
           importedBuffer={importedBuffer}
           setImportedBuffer={setImportedBuffer}
-          setWatOpen={setWatOpen}
+          setCodeOpen={setCodeOpen}
           openExamples={openExamples}
           setOpenExamples={setOpenExamples}
           openStoredFiles={openStoredFiles}
@@ -299,8 +313,9 @@ function App() {
         />
         <MuiCodeView 
           watText={watText}
+          tsText={tsText}
           watOpen={watOpen}
-          setWatOpen={setWatOpen}
+          setCodeOpen={setCodeOpen}
           filename={filename}
           isImportedOrDb={isImportedOrDb}
         />
