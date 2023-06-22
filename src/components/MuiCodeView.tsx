@@ -8,7 +8,7 @@ import InsertDriveFileIcon from '@mui/icons-material/InsertDriveFile';
 function Codeview(props: {
     watText:string,
     tsText:string,
-    watOpen:boolean,
+    codeOpen:boolean,
     setCodeOpen: (b:boolean)=>void,
     filename:string,
     isImportedOrDb: boolean
@@ -18,7 +18,7 @@ function Codeview(props: {
     const [changeCodeBool, setChangeCodeBool] = useState(false);
     function collapseContainer(){
             if(props.watText !== ''){
-                props.setCodeOpen(!props.watOpen)
+                props.setCodeOpen(!props.codeOpen)
             }
       }
 
@@ -37,25 +37,25 @@ function Codeview(props: {
         >
         <IconButton onClick={collapseContainer}>
             <KeyboardArrowDownIcon sx={{
-                display: props.watOpen? 'inline-block' : 'none'
+                display: props.codeOpen? 'inline-block' : 'none'
             }}
             />
             <KeyboardArrowUpIcon sx={{
-                display: props.watOpen? 'none' : 'inline-block'
+                display: props.codeOpen? 'none' : 'inline-block'
             }}/>
         </IconButton>
          Code view
          <IconButton onClick={collapseContainer}>
             <KeyboardArrowDownIcon sx={{
-                display: props.watOpen? 'inline-block' : 'none'
+                display: props.codeOpen? 'inline-block' : 'none'
             }}
           />
             <KeyboardArrowUpIcon sx={{
-                display: props.watOpen? 'none' : 'inline-block'
+                display: props.codeOpen? 'none' : 'inline-block'
             }}/>
         </IconButton>
         </Typography>
-        <Collapse in={props.watOpen} sx={{paddingTop:"5px"}}>
+        <Collapse in={props.codeOpen} sx={{paddingTop:"5px"}}>
             {/* filename label */}
             <AppBar position='static' sx={{ 
                 bgcolor:'lightgrey',
