@@ -40,7 +40,7 @@ function App() {
   const [tsText, settsText] = useState('');
 
   const [wasmPatches, setwasmPatches] = useState([] as patchesDescriptor[]);
-  const [val, setVal] = useState(-1);
+  const [val, setVal] = useState(0);
 
   async function updateWasmExample(filename:string){
     setIsImportedOrDb(false);
@@ -48,7 +48,7 @@ function App() {
     setWasmStores({} as execTypes.storeProducePatches);
     setwasmPatches([] as patchesDescriptor[]);
     setFilename(filename);
-    setwatText(await getWat(`${filename}.wat`));
+    setwatText(await getWatExamle(`${filename}.wat`));
     const instSource = await instantiateModule(filename);
     setWasmInstance(instSource.instance);
     setWasmModule(instSource.module);
@@ -64,8 +64,7 @@ function App() {
     setWasmInstance(instSource.instance);
     setWasmModule(instSource.module);
   }
-  async function updateWasmStoredfile(filename:string, buffer:ArrayBuffer){
-    setIsImportedOrDb(true);
+  async function updateWasmStoredfile(filename:string){
     setwasmStates([]);
     setWasmStores({} as execTypes.storeProducePatches);
     setwasmPatches([] as patchesDescriptor[]);
@@ -76,7 +75,6 @@ function App() {
       if(res instanceof Blob){
         getTextFromBlob(res).then(watCode => {
           setwatText(watCode);
-          setCodeOpen(true);
         })
       }
     });
@@ -88,11 +86,9 @@ function App() {
         })
       }
     });
-
-    // not working
-    // const instSource = await instantiateStoredFile(buffer);
-    // setWasmInstance(instSource.instance);
-    // setWasmModule(instSource.module);
+    const instSource = await instantiateModule();
+    setWasmInstance(instSource.instance);
+    setWasmModule(instSource.module);
   }
 
   function getTextFromBlob(blob: Blob): Promise<string> {
@@ -129,7 +125,7 @@ function App() {
 
   // Collapsers hooks & togglers
   const [ShowParamsAlert, setShowParamsAlert] = useState(false);
-  const [watOpen, setCodeOpen] = useState(false);
+  const [codeOpen, setCodeOpen] = useState(false);
   const [paramsOpen, setParamsOpen] = useState(false);
   const [execToggler, setExecToggler] = useState(true);
   const [openExamples, setOpenExamples] = useState(false);
@@ -227,7 +223,7 @@ function App() {
   async function instantiateModule(filename?:string):Promise<execTypes.WebAssemblyMtsInstantiatedSource>{
     // not passing filename means it's an imported wasm
     let buffer:ArrayBuffer;
-    filename ? buffer = await getWasm(`${filename}.wasm`) : buffer = importedBuffer;
+    filename ? buffer = await getWasmExamle(`${filename}.wasm`) : buffer = importedBuffer;
     
     //@ts-ignore
     const inst = await WASMMTS.instantiate(new Uint8Array(buffer));
@@ -235,24 +231,23 @@ function App() {
     return inst;
   }
   
-  async function instantiateStoredFile(buffer:ArrayBuffer):Promise<execTypes.WebAssemblyMtsInstantiatedSource>{
-    return new Promise((resolve, reject) => {
-      WASMMTS.instantiate(new Uint8Array(buffer)).then((inst) => {
-        console.log("inst",inst);
-        resolve(inst);
-      }).catch((error)=>{
-        console.log(`Error during instantiation: ${error}`);
-      });
-    })
+  // async function instantiateStoredFile(buffer:ArrayBuffer):Promise<execTypes.WebAssemblyMtsInstantiatedSource>{
+  //   return new Promise((resolve, reject) => {
+  //     WASMMTS.instantiate(new Uint8Array(buffer)).then((inst) => {
+  //       console.log("inst",inst);
+  //       resolve(inst);
+  //     }).catch((error)=>{
+  //       console.log(`Error during instantiation: ${error}`);
+  //     });
+  //   })
     
-  }
+  // }
   
 
   useEffect(() => {
     if(isImportedOrDb === true){
-      updateWasmImport(filename);
-      setCodeOpen(false);
-    }else if(isImportedOrDb === false && filename !== ''){
+      updateWasmStoredfile(importedName);
+    } else if(isImportedOrDb === false && filename !== ''){
         updateWasmExample(filename);
         setCodeOpen(true);
     }else{
@@ -287,7 +282,9 @@ function App() {
           setOpenExamples={setOpenExamples}
           openStoredFiles={openStoredFiles}
           setOpenStoredFiles={setOpenStoredFiles}
+          updateWasmImport={updateWasmImport}
           updateWasmStoredfile={updateWasmStoredfile}
+          setIsImportedOrDb={setIsImportedOrDb}
         />
         <MuiFunctionSelector 
           setFunc={setFuncname} 
@@ -314,7 +311,7 @@ function App() {
         <MuiCodeView 
           watText={watText}
           tsText={tsText}
-          watOpen={watOpen}
+          codeOpen={codeOpen}
           setCodeOpen={setCodeOpen}
           filename={filename}
           isImportedOrDb={isImportedOrDb}
@@ -338,13 +335,13 @@ function App() {
 }
 
 // Getter functions for /EXAMPLES/
-async function getWasm(path:string):Promise<ArrayBuffer>{
+async function getWasmExamle(path:string):Promise<ArrayBuffer>{
   const res:Response = await fetch(`./examples/${path}`);
   const wasmBuffer = await res.arrayBuffer();
   return wasmBuffer;
 }
  
-async function getWat(path:string):Promise<string>{
+async function getWatExamle(path:string):Promise<string>{
   const res:Response = await fetch(`./examples/${path}`);
   if(res.status === 200){
     const watText = await res.text();
