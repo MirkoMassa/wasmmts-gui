@@ -3,20 +3,29 @@ import { useState } from 'react'
 import { AppBar, Collapse, Container, IconButton, Typography } from '@mui/material';
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
+import CodeIcon from '@mui/icons-material/Code';
+import InsertDriveFileIcon from '@mui/icons-material/InsertDriveFile';
 function Codeview(props: {
     watText:string,
+    tsText:string,
     watOpen:boolean,
-    setWatOpen: (b:boolean)=>void,
+    setCodeOpen: (b:boolean)=>void,
     filename:string,
     isImportedOrDb: boolean
     }) {
     const watTextAsArray = props.watText.split('\n');
-
+    const tsTextAsArray = props.tsText.split('\n');
+    const [changeCodeBool, setChangeCodeBool] = useState(false);
     function collapseContainer(){
-            if(props.watText !== '' && props.isImportedOrDb === false){
-                props.setWatOpen(!props.watOpen)
+            if(props.watText !== ''){
+                props.setCodeOpen(!props.watOpen)
             }
       }
+
+    function changeCode(){
+        setChangeCodeBool(!changeCodeBool);
+    }
+
   return (
     <Container sx={{
         paddingY:'16px',
@@ -35,7 +44,7 @@ function Codeview(props: {
                 display: props.watOpen? 'none' : 'inline-block'
             }}/>
         </IconButton>
-         WebAssembly Text Format
+         Code view
          <IconButton onClick={collapseContainer}>
             <KeyboardArrowDownIcon sx={{
                 display: props.watOpen? 'inline-block' : 'none'
@@ -48,12 +57,50 @@ function Codeview(props: {
         </Typography>
         <Collapse in={props.watOpen} sx={{paddingTop:"5px"}}>
             {/* filename label */}
-            <AppBar position='static' sx={{ bgcolor:'lightgrey'}}>
-                <Typography variant="subtitle1" color='black'>{props.filename}.wat</Typography>
+            <AppBar position='static' sx={{ 
+                bgcolor:'lightgrey',
+
+                }}>
+                <div style={{ 
+                    display: 'flex', 
+                    alignItems: 'center',
+                    justifyContent: 'space-between',
+                    flexGrow: 1,
+                    marginLeft: '10px',
+                    marginRight: '10px',
+                    }}>
+                    <InsertDriveFileIcon sx={{
+                        color:'black',
+                        marginRight:'5px'
+                    }}/>
+                    <Typography variant="subtitle1" color='black' style={{ flexGrow: 1 }}>{props.filename}
+                        {changeCodeBool? '.wat' : '.ts'}
+                    </Typography>
+                    
+                    {/* Change code between .ts and .wat */}
+                    <IconButton onClick={changeCode}>
+                    <CodeIcon/>
+                    <Typography variant="subtitle1" color='black'>
+                        {changeCodeBool? '.ts' : '.wat'}
+                    </Typography>
+                </IconButton>
+            </div>
             </AppBar>
-            {/* actual code */}
-            <pre className="WatText">
+            {/* wat code */}
+            <pre className="WatText" style={{
+                display: changeCodeBool? 'grid' : 'none'
+                }}>                    
                 {watTextAsArray.map(row => 
+                <><span className="lineNum">
+                    </span>
+                    <code>{row}</code>
+                </>)}
+            </pre>
+            {/* ts code */}
+            <pre className="WatText" style={{
+                display: changeCodeBool? 'none' : 'grid'
+                }}>                    
+                {tsTextAsArray.map(row => 
                 <><span className="lineNum">
                     </span>
                     <code>{row}</code>
