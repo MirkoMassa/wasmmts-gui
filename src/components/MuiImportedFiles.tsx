@@ -5,13 +5,14 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import { Padding } from '@mui/icons-material';
 
 function MuiImportedFiles (props:{
+    setIsImportedOrDb: (b:boolean) => void,
     openStoredFiles:boolean,
     setOpenStoredFiles: (b:boolean) => void,
     filename:string,
     setFilename: (f:string) => void,
     setImportedName: (f:string) => void,
-    updateWasmStoredfile: (filename:string, buffer:ArrayBuffer) => void
-
+    updateWasmStoredfile: (filename:string) => void,
+    setImportedBuffer: (ab:ArrayBuffer) => void
 }) {
     
     // mutable ref obj for the select component
@@ -41,19 +42,22 @@ function MuiImportedFiles (props:{
         const selectedKey = event.target.value as string;
         const index = allKeys.indexOf(selectedKey);
         // props.setFilename(selectedKey)
-        const file = await allObjects[index].arrayBuffer();
-        console.log(file)
-        props.updateWasmStoredfile(selectedKey, file);
+        await allObjects[index].arrayBuffer().then((buffer) => {
+            console.log('arraybuffer',buffer);
+            props.setImportedBuffer(buffer);
+            props.setImportedName(selectedKey);
+            props.setIsImportedOrDb(true);
+        });
+        
     
     };
     async function handleFileDelete(key:string) {
         setStayOpen(true);
         await removeObj(key +'.wasm').then( () =>{
             setStayOpen(false);
-            props.setFilename('')
-            props.setImportedName('')
+            props.setFilename('');
+            props.setImportedName('');
         })
-        
     }
 
     useEffect(() => {
@@ -85,11 +89,10 @@ function MuiImportedFiles (props:{
             label="Function"
             onChange={handleChange}
             renderValue={renderValue}
-
         >
         {allKeys.map((key, i) =>
             <MenuItem value={key} sx={{ display:'flex', alignItems:'left'}}>
-                <Container 
+                <Container
                 sx= {{zIndex:1}} >
                     { `${key}.wasm` }
                 </Container>
