@@ -245,9 +245,11 @@ function App() {
   
 
   useEffect(() => {
-    if(isImportedOrDb === true){
-      updateWasmStoredfile(importedName);
-    } else if(isImportedOrDb === false && filename !== ''){
+    // @TODO solve crash problem on updatewasmstoredfile
+    // if(isImportedOrDb === true){
+    //   updateWasmStoredfile(importedName);
+    // } 
+    if(isImportedOrDb === false && filename !== ''){
         updateWasmExample(filename);
         setCodeOpen(true);
     }else{
