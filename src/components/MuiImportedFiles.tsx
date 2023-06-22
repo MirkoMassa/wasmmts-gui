@@ -30,7 +30,6 @@ function MuiImportedFiles (props:{
         setAllObjects(resAllObj);
     }
 
-    const [selectedValue, setSelectedValue] = useState(props.filename);
     const renderValue = (selectedValue:string) => (
         <Container>
           {selectedValue}.wasm
@@ -41,8 +40,9 @@ function MuiImportedFiles (props:{
         setStayOpen(false);
         const selectedKey = event.target.value as string;
         const index = allKeys.indexOf(selectedKey);
+        // props.setFilename(selectedKey)
         const file = await allObjects[index].arrayBuffer();
-        setSelectedValue(selectedKey);
+        console.log(file)
         props.updateWasmStoredfile(selectedKey, file);
     
     };
