@@ -35,7 +35,7 @@ function ActionButtons (
       setImportedName: (s:string) => void,
       importedBuffer: ArrayBuffer,
       setImportedBuffer: (ab:ArrayBuffer) => void,
-      setWatOpen: (b:boolean) => void,
+      setCodeOpen: (b:boolean) => void,
 
       openExamples: boolean,
       setOpenExamples: (b:boolean) => void,
