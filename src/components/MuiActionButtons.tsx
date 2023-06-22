@@ -18,7 +18,7 @@ const api_url = process.env.REACT_APP_API_URL;
 
 function ActionButtons (
   props:{
-      run:(paramsCount:number) => void,
+      run:() => void,
       funcName:string,
 
       filename: string,
@@ -43,16 +43,16 @@ function ActionButtons (
       openStoredFiles:boolean,
       setOpenStoredFiles: (b:boolean) => void,
 
-      updateWasmStoredfile: (filename:string, buffer:ArrayBuffer) => void
+      updateWasmImport: (filename:string) => void,
+      updateWasmStoredfile: (filename:string) => void,
+
+      setIsImportedOrDb: (b:boolean) => void
   }){
   const matches = useMediaQuery('(min-width:800px)');
 
   const [openWarning, setOpenWarning] = useState(false);
   const [funcsCount, setFuncsCount] = useState(0);
-  const [paramsCount, setParamsCount] = useState(0);
 
-  const [openError, setOpenError] = useState(false);
-  const [importError, setImportError] = useState(false);
   const [openImportError, setOpenImportError] = useState(false);
 
   // used to execute console commands like asc compiling
@@ -111,7 +111,7 @@ function ActionButtons (
   }
 
   async function handleWasmImport(file:File){
-    if(file && file.type === 'application/wasm'){
+    if(file){
       // clearing everything
       handleClear();
 
@@ -134,17 +134,18 @@ function ActionButtons (
             return;
           }
         }
-        // storing wasm in the db
+        // storing wasm in the db and updating hooks
         dbReqRes(file);
         props.setImportedName(file.name);
         props.setImportedBuffer(importedBuffer);
+
       }
     }
   }
 
   function executeRunButton(){
     if(props.funcName !== ''){
-      props.run(paramsCount);
+      props.run();
     }else{
         setOpenWarning(true);
     }
@@ -250,12 +251,14 @@ function ActionButtons (
     />
     {/* Imported files collapse */}
     <MuiImportedFiles
+      setIsImportedOrDb={props.setIsImportedOrDb}
       openStoredFiles={props.openStoredFiles}
       setOpenStoredFiles={props.setOpenStoredFiles}
       filename={props.filename}
       setFilename={props.setFilename}
       setImportedName={props.setImportedName}
       updateWasmStoredfile={props.updateWasmStoredfile}
+      setImportedBuffer={props.setImportedBuffer}
     />
 
     <MuiFunctionAlert
