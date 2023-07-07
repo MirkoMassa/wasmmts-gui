@@ -67,16 +67,54 @@ function ActionButtons (
     }
   };
 
-  async function handleTsImport(file:File){
-      console.log('type',file.type)
-      const fileName = file.name;
-      const filenameNoExt = fileName.slice(0, fileName.length-3);
-
-      handleClear();
-      dbReqRes(file);
-
-      // storing .ts and creating hash
+  const executeWasm2Wat = async (fileName:string) => {
       try {
+        const response = await axios.post(`${api_url}/wat2wasmCompile`, {fileName});
+        console.log('res:',response.data.message);
+      } catch (error) {
+        // @ts-ignore
+        console.error('Error executing command:', error.message);
+    }
+  };
+
+  async function handleWasmToWat(file:File){
+    const fileName = file.name;
+    const fileNameNoExt = fileName.replace(/\.[^.]+$/, '');
+    handleWasmImport(file);
+    try {
+      const formData = new FormData();
+      formData.append('file', file);
+      const hash = await axios.post(`${api_url}/uploadTemp`, formData);
+      formData.delete('file');
+      // passing hash and fileName
+      const blobHash = new Blob([hash.data]);
+      formData.append('hash', blobHash);
+      formData.append('fileName', fileName);
+      let response = await axios.post(`${api_url}/uploadHash`, formData);
+      console.log('Hash stored:',response);
+      // compiling to wat
+      await executeWasm2Wat(fileName).then(async () => {
+        formData.delete('fileName');
+        formData.append('fileName', `${fileNameNoExt}.wat`);
+        const watFile = await axios.post(`${api_url}/compiledFiles`, formData);
+        await dbReqRes(new File([watFile.data], `${fileNameNoExt}.wat`));
+      })
+    } catch {
+        // @ts-ignore
+        console.error('Error storing temp file:', error.message);
+    }
+    await axios.post(`${api_url}/clearTempFiles`, { fileNameNoExt });
+  }
+
+  async function handleTsImport(file:File){
+    console.log('type',file.type)
+    const fileName = file.name;
+    const fileNameNoExt = fileName.replace(/\.[^.]+$/, '');
+    handleClear();
+    dbReqRes(file);
+
+    // storing .ts and creating hash
+    try {
       const formData = new FormData();
       // passing .ts file
       formData.append('file', file);
@@ -91,23 +129,23 @@ function ActionButtons (
       // compiling
       await executeCompileRequest(fileName).then(async () => {
         formData.delete('fileName');
-        formData.append('fileName', `${filenameNoExt}.wat`);
+        formData.append('fileName', `${fileNameNoExt}.wat`);
         // taking wat file
         const watFile = await axios.post(`${api_url}/compiledFiles`, formData);
         formData.delete('fileName');
-        formData.append('fileName', `${filenameNoExt}.wasm`);
+        formData.append('fileName', `${fileNameNoExt}.wasm`);
         const wasmFile = await axios.post(`${api_url}/compiledFiles`, formData);
 
         // console.log(watFile.data, 'wasm',wasmFile.data);
-        await dbReqRes(new File([watFile.data], `${filenameNoExt}.wat`));
-        await dbReqRes(new File([wasmFile.data], `${filenameNoExt}.wasm`));
+        await dbReqRes(new File([watFile.data], `${fileNameNoExt}.wat`));
+        await dbReqRes(new File([wasmFile.data], `${fileNameNoExt}.wasm`));
       })
       } catch (error) {
         // @ts-ignore
         console.error('Error storing temp file:', error.message);
       }
       // removing temp files
-      await axios.post(`${api_url}/clearTempFiles`, { filenameNoExt });
+      await axios.post(`${api_url}/clearTempFiles`, { fileNameNoExt });
   }
 
   async function handleWasmImport(file:File){
@@ -204,6 +242,7 @@ function ActionButtons (
           matches={matches}
           handleWasmImport={handleWasmImport}
           handleTsImport={handleTsImport}
+          handleWasmToWat={handleWasmToWat}
         />
         {/* STORED FILES BTN */}
         <IconButton size={matches?'large':'small'} onClick={handleFiles}
