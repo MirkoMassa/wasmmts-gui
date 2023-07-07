@@ -65,6 +65,7 @@ app.post('/webhook', (req, res) => {
 
 // uploading temporary .ts file, compiled to wat and wasm and
 // then deleted from the temp folder.
+// RES HASH OF UPLOADED FILE
 app.post('/uploadTemp', (req, res) => {
     // checking if there are passed files
     if (!req.files || Object.keys(req.files).length === 0) {
@@ -94,7 +95,7 @@ app.post('/uploadHash', (req, res) => {
   }
   const { hash } = req.files;
   const { fileName } = req.body;
-  const fileNameNoExt = fileName.slice(0, fileName.length-3);
+  const fileNameNoExt = fileName.replace(/\.[^.]+$/, '');
   if(!Array.isArray(hash)){
     hash.mv('tempFiles/' + `${fileNameNoExt}.hash`, (err) => {
       if (err) {
@@ -108,8 +109,9 @@ app.post('/uploadHash', (req, res) => {
 
   app.post('/clearTempFiles', (req, res) => {
 
-    const { filenameNoExt } = req.body;
-    let filePath = `tempFiles/${filenameNoExt}.hash`;
+    const { fileNameNoExt } = req.body;
+    console.log("clearing:",fileNameNoExt);
+    let filePath = `tempFiles/${fileNameNoExt}.hash`;
     fs.unlink(filePath, (error) => {
       if (error) {
         console.error(`Error deleting file ${filePath}: ${error}`);
@@ -118,7 +120,7 @@ app.post('/uploadHash', (req, res) => {
         console.log(`File ${filePath}.hash deleted successfully`);
       }
     });
-    filePath = `tempFiles/${filenameNoExt}.wat`;
+    filePath = `tempFiles/${fileNameNoExt}.wat`;
     fs.unlink(filePath, (error) => {
       if (error) {
         console.error(`Error deleting file ${filePath}: ${error}`);
@@ -127,7 +129,7 @@ app.post('/uploadHash', (req, res) => {
         console.log(`File ${filePath}.wat deleted successfully`);
       }
     });
-    filePath = `tempFiles/${filenameNoExt}.wasm`;
+    filePath = `tempFiles/${fileNameNoExt}.wasm`;
     fs.unlink(filePath, (error) => {
       if (error) {
         console.error(`Error deleting file ${filePath}: ${error}`);
@@ -136,7 +138,7 @@ app.post('/uploadHash', (req, res) => {
         console.log(`File ${filePath}.wasm deleted successfully`);
       }
     });
-    filePath = `tempFiles/${filenameNoExt}.ts`;
+    filePath = `tempFiles/${fileNameNoExt}.ts`;
     fs.unlink(filePath, (error) => {
       if (error) {
         console.error(`Error deleting file ${filePath}: ${error}`);
@@ -175,6 +177,29 @@ app.post('/tsCompile', (req, res) => {
   });
 });
 
+app.post('/wat2wasmCompile', (req, res) => {
+
+  const { fileName } = req.body;
+
+  const fileNameNoExt = fileName.replace(/\.[^.]+$/, '');
+  const filePath = `tempFiles/${fileName}`;
+  const command = 
+  `./wasm2wat tempFiles/${fileNameNoExt}.wasm -o tempFiles/${fileNameNoExt}.wat`;
+  console.log('compiling', fileName);
+  const child = childProcess.exec(command, (error, stdout, stderr) => {
+    if (error) {
+      console.error(`Error during wat2wasm execution: ${error.message}`);
+      res.status(500).json({ message: 'Command execution failed.' });
+      return;
+    }
+    if (stderr) {
+      console.error(`asc stderror: ${stderr}`);
+      res.status(500).json({ message: 'Command execution failed.' });
+      return;
+    }
+    res.status(200).json({ message: 'Command executed successfully.' });
+  });
+});
 
 app.post('/compiledFiles', (req, res) => {
   
