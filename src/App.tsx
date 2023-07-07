@@ -86,9 +86,9 @@ function App() {
         })
       }
     });
-    const instSource = await instantiateModule();
-    setWasmInstance(instSource.instance);
-    setWasmModule(instSource.module);
+    // const instSource = await instantiateModule();
+    // setWasmInstance(instSource.instance);
+    // setWasmModule(instSource.module);
   }
 
   function getTextFromBlob(blob: Blob): Promise<string> {
@@ -246,9 +246,9 @@ function App() {
 
   useEffect(() => {
     // @TODO solve crash problem on updatewasmstoredfile
-    // if(isImportedOrDb === true){
-    //   updateWasmStoredfile(importedName);
-    // } 
+    if(isImportedOrDb === true){
+      updateWasmStoredfile(importedName);
+    } 
     if(isImportedOrDb === false && filename !== ''){
         updateWasmExample(filename);
         setCodeOpen(true);
