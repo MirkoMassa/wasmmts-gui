@@ -41,7 +41,7 @@ function MuiImportedFiles (props:{
         setStayOpen(false);
         const selectedKey = event.target.value as string;
         const index = allKeys.indexOf(selectedKey);
-        // props.setFilename(selectedKey)
+        props.setFilename(selectedKey);
         await allObjects[index].arrayBuffer().then((buffer) => {
             console.log('arraybuffer',buffer);
             props.setImportedBuffer(buffer);
